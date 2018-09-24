@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical"
+
+    tools:context="com.ulan.az.usluga.service.ServiceMoreInfoActivity">
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ScrollView
+            android:layout_marginBottom="70dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_marginBottom="0dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp">
+
+                    <ImageView
+
+                        android:id="@+id/avatar"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/placeholder_image" />
+
+
+                    <ImageView
+                        android:id="@+id/star"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="20dp"
+                        android:src="@drawable/ic_action_star_none_active"
+                        android:visibility="visible" />
+
+
+                    <TextView
+                        android:id="@+id/name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="10dp"
+                        android:layout_toEndOf="@+id/avatar"
+                        android:layout_toRightOf="@+id/avatar"
+                        android:text="dsfsdfsdfdsf"
+                        android:textColor="#000"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+
+
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/back_description"
+                    android:padding="15dp"
+                    android:id="@+id/desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="jkfbkjhgjhdjfogjdhfgjhiudfhgjdfjkgldkfhhjlkadklfakdjfklajsdklfjklajdlkfjaklsjdfklajsdlkfjaksdjfklajsdfklajsdkfjasdlkfjksldfjklasjfklasdjfklajdfklajdklfajsdlkfjadlkfjaklfjakjdfklajdsflkajsdlkfaklfjlaks"
+                    android:textColor="#000" />
+
+
+                <org.osmdroid.views.MapView
+                    android:id="@+id/mapView"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"></org.osmdroid.views.MapView>
+
+                <Button
+                    android:layout_marginTop="20dp"
+                    android:visibility="visible"
+                    android:textColor="#fff"
+                    android:layout_gravity="center"
+                    android:paddingRight="20dp"
+                    android:paddingLeft="20dp"
+                    android:text="Предложить услугу"
+                    android:id="@+id/btn_add"
+                    android:background="@drawable/btn_back_violet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+
+
+
+
+
+
+
+                <android.support.v7.widget.CardView
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="15dp"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/img_phone"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginRight="10dp"
+                            android:onClick="onClickPhone"
+                            android:src="@drawable/ic_action_phone" />
+
+                        <TextView
+                            android:id="@+id/phone_hint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@+id/img_phone"
+                            android:layout_toRightOf="@+id/img_phone"
+                            android:onClick="onClickPhone"
+                            android:text="Телефонный номер" />
+
+                        <TextView
+                            android:id="@+id/phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"
+                            android:layout_below="@+id/phone_hint"
+                            android:layout_toRightOf="@+id/img_phone"
+                            android:autoLink="all"
+                            android:onClick="onClickPhone"
+                            android:text="701991855"
+                            android:textColor="#000"
+                            android:textColorLink="#111" />
+
+                        <View
+                            android:id="@+id/view1"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_below="@+id/phone"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_toEndOf="@+id/img_phone"
+                            android:layout_toRightOf="@+id/img_phone"
+                            android:background="#ccc" />
+
+                        <ImageView
+                            android:id="@+id/btn_address"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:layout_below="@+id/view1"
+                            android:src="@drawable/ic_action_marker" />
+
+                        <TextView
+                            android:id="@+id/address_hint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/view1"
+                            android:layout_toEndOf="@+id/img_phone"
+                            android:layout_toRightOf="@+id/img_phone"
+                            android:text="Адрес" />
+
+                        <TextView
+                            android:id="@+id/address"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/address_hint"
+                            android:layout_toEndOf="@+id/img_phone"
+                            android:layout_toRightOf="@+id/img_phone"
+                            android:text="8 mkr"
+                            android:textColor="#000" />
+
+                        <View
+                            android:id="@+id/view2"
+                            android:layout_width="match_parent"
+
+                            android:layout_height="1dp"
+                            android:layout_below="@+id/address"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginTop="10dp"
+
+
+                            android:layout_toEndOf="@+id/img_phone"
+                            android:layout_toRightOf="@+id/img_phone"
+                            android:background="#ccc" />
+
+                        <TextView
+                            android:id="@+id/experience_hint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/view2"
+                            android:layout_toEndOf="@+id/img_phone"
+                            android:layout_toRightOf="@+id/img_phone"
+                            android:text="Опыт" />
+
+                        <TextView
+                            android:id="@+id/experience"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/experience_hint"
+                            android:layout_toEndOf="@+id/img_phone"
+                            android:layout_toRightOf="@+id/img_phone"
+                            android:text="5"
+                            android:textColor="#000" />
+
+                        <ImageView
+                            android:id="@+id/img_experience"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_below="@+id/view2"
+                            android:src="@drawable/ic_action_experience" />
+
+                        <View
+
+                            android:id="@+id/view3"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_below="@+id/experience"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_toEndOf="@+id/img_phone"
+                            android:layout_toRightOf="@+id/img_phone"
+                            android:background="#ccc" />
+
+                        <TextView
+                            android:id="@+id/desc_hint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/view3"
+                            android:layout_toEndOf="@+id/img_phone"
+                            android:layout_toRightOf="@+id/img_phone"
+                            android:text="Описание" />
+
+
+                        <ImageView
+
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_below="@+id/view3"
+                            android:src="@drawable/ic_action_desc" />
+
+                    </RelativeLayout>
+                </android.support.v7.widget.CardView>
+            </LinearLayout>
+        </ScrollView>
+        <Button
+            android:onClick="onClickPhone"
+            android:id="@+id/btn_call"
+            android:textColor="#fff"
+            android:text="Позвонить"
+            android:background="@drawable/button_back"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="60dp" />
+    </RelativeLayout>
+
+</LinearLayout>

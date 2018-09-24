@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#fff"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:orientation="vertical">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ulan Karimov"
+        android:layout_weight="1"
+        android:textColor="#000"
+        android:textSize="19sp"
+        android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/clear"
+            android:background="@drawable/ic_action_clear"
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+    </LinearLayout>
+
+        <TextView
+            android:id="@+id/phone"
+            android:layout_marginRight="35dp"
+            android:autoLink="all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0701991855" />
+
+
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/btn"
+        android:textColor="#3c8def"
+        android:layout_marginRight="30dp"
+        android:layout_gravity="right"
+        android:text="Полная Информация -->"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_favorite"
+            android:icon="@drawable/ic_action_star_none_active"
+            android:title="Избранное" />
+        <item
+            android:id="@+id/nav_order"
+            android:icon="@drawable/ic_action_user"
+            android:title="Мои задачи" />
+        <item
+            android:id="@+id/nav_forum"
+            android:icon="@drawable/ic_action_desc"
+            android:title="Мой форум" />
+    </group>
+
+</menu>

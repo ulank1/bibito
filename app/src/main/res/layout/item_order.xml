@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="15dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:maxLines="2"
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ulan Karimov"
+        android:textColor="#000"
+        android:textSize="16sp" />
+
+        <TextView
+            android:visibility="gone"
+            android:textColorLink="#111"
+            android:id="@+id/phone"
+            android:layout_marginRight="35dp"
+            android:autoLink="all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0701991855" />
+
+
+</LinearLayout>
