@@ -19,6 +19,12 @@
         android:layout_height="wrap_content" />
 
     <ImageView
+        android:src="@drawable/ic_redactor"
+        android:id="@+id/redactor"
+        android:layout_width="40dp"
+        android:layout_height="40dp" />
+
+    <ImageView
         android:src="@drawable/ic_action_delete"
         android:id="@+id/delete"
         android:layout_width="40dp"

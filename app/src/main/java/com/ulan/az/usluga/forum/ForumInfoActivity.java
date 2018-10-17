@@ -1,5 +1,13 @@
 package com.ulan.az.usluga.forum;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -10,11 +18,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.R;
@@ -28,7 +39,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -40,7 +54,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ForumInfoActivity extends AppCompatActivity {
-    TextView title, description, count;
+    TextView title, description, count, name, date;
     Button add;
     LinearLayout line;
     Forum forum;
@@ -49,12 +63,15 @@ public class ForumInfoActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
     RVCommentAdapter adapter;
     ArrayList<Comment> comments;
+    ImageView avatar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum_info);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        name = findViewById(R.id.name);
+        date = findViewById(R.id.date);
+        avatar = findViewById(R.id.avatar);
         title = findViewById(R.id.title);
         description = findViewById(R.id.desc);
         count = findViewById(R.id.count);
@@ -99,6 +116,18 @@ public class ForumInfoActivity extends AppCompatActivity {
         });
 
 
+        name.setText(forum.getUser().getName() + "");
+
+        Glide.with(this).load("http://145.239.33.4:5555"+forum.getUser().getImage()).asBitmap().centerCrop().into(new BitmapImageViewTarget(avatar) {
+            @Override
+            protected void setResource(Bitmap resource) {
+                RoundedBitmapDrawable circularBitmapDrawable =
+                        RoundedBitmapDrawableFactory.create(getResources(), resource);
+                circularBitmapDrawable.setCircular(true);
+                avatar.setImageDrawable(circularBitmapDrawable);
+            }
+        });
+
         mRecyclerView = (RecyclerView) findViewById(R.id.rv);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
@@ -106,9 +135,10 @@ public class ForumInfoActivity extends AppCompatActivity {
 
         //Log.e("tag", getArguments().getInt("tag") + "");
 
-        LinearLayoutManager llm = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,true);
+        LinearLayoutManager llm = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(llm);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setNestedScrollingEnabled(false);
 
 
         ClientApiListener listener = new ClientApiListener() {
@@ -138,6 +168,8 @@ public class ForumInfoActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(forum.title);
         ClientApi.requestGet(URLS.confirmation + "&forum=" + forum.getId() + "&user=" + E.getAppPreferencesINT(E.APP_PREFERENCES_ID, ForumInfoActivity.this), listener);
 
+        date.setText(forum.getDate()+"");
+
         title.setText(forum.getTitle());
         description.setText(forum.getDescription());
 
@@ -162,6 +194,7 @@ public class ForumInfoActivity extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        add.setVisibility(View.GONE);
                                         Toast.makeText(ForumInfoActivity.this, "Отправлено", Toast.LENGTH_SHORT).show();
                                         send();
 
@@ -253,13 +286,10 @@ public class ForumInfoActivity extends AppCompatActivity {
                             Comment comment  = new Comment();
                             comment.setComment(object.getString("comment"));
 
-                            String date = object.getString("created_at");
-                            String date1 = date.split("T")[0];
-                            String time = date.split("T")[1];
-                            String[] times = time.split(":");
-                            time = times[0]+":"+times[1];
+                            String date = object.getString("updated_at");
 
-                            comment.setDate(date+" "+time);
+
+                            comment.setDate(parseDate(date));
 
                             User user = new User();
                             JSONObject jsonUser = object.getJSONObject("user");
@@ -298,4 +328,35 @@ public class ForumInfoActivity extends AppCompatActivity {
     }
 
 
+    public String parseDate(String inputDate) {
+        String DATE_FORMAT_I = "yyyy-MM-dd'T'HH:mm:ss";
+        String DATE_FORMAT_O = "yyyy-MM-dd. HH:mm";
+
+        SimpleDateFormat formatInput = new SimpleDateFormat(DATE_FORMAT_I);
+        SimpleDateFormat formatOutput = new SimpleDateFormat(DATE_FORMAT_O);
+        Date date = null;
+        try {
+            date = formatInput.parse(inputDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String dateString = formatOutput.format(date);
+        return dateString;
+    }
+
+    public void onClickPhone(View view) {
+
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "+" + forum.getUser().getPhone()));
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        startActivity(intent);
+    }
 }

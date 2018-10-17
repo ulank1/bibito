@@ -80,7 +80,7 @@ public class OrderCategoryFragment extends Fragment implements FilterListener{
                         }
                         //Log.e("size", serviceArrayList.size() + "");
 
-                        Shared.orderCategories = serviceArrayList;
+                        //Shared.orderCategories = serviceArrayList;
 
                         adapter = new RVCategoryAdapter(getActivity(), serviceArrayList, getArguments().getInt("tag"));
                         getActivity().runOnUiThread(new Runnable() {
@@ -103,7 +103,7 @@ public class OrderCategoryFragment extends Fragment implements FilterListener{
         Main2Activity activity = (Main2Activity) getActivity();
 
             //Log.e("DDD", "2");
-            activity.setOrderApiListener(this);
+//            activity.setOrderApiListener(this);
             activity.setViewPager();
 
         return view;

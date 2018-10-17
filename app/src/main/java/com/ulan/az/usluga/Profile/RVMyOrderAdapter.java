@@ -1,6 +1,7 @@
 package com.ulan.az.usluga.Profile;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -27,7 +28,7 @@ public class RVMyOrderAdapter extends RecyclerView.Adapter<RVMyOrderAdapter.Pers
     public class PersonViewHolder extends RecyclerView.ViewHolder {
 
        TextView category;
-       ImageView imageView;
+       ImageView imageView,redactor;
        DataHelper dataHelper;
        RecyclerView mRecyclerView;
 
@@ -40,6 +41,19 @@ public class RVMyOrderAdapter extends RecyclerView.Adapter<RVMyOrderAdapter.Pers
             category = (TextView) itemView.findViewById(R.id.category);
 
             dataHelper = new DataHelper(context);
+
+            redactor = (ImageView) itemView.findViewById(R.id.redactor);
+
+            redactor.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context,RedactorOrderActivity.class);
+                    intent.putExtra("service",listVse.get(getAdapterPosition()));
+                    context.startActivity(intent);
+                }
+            });
+
+
             category.setVisibility(View.VISIBLE);
             imageView.setOnClickListener(new OnClickListener() {
                 @Override

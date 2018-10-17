@@ -190,7 +190,7 @@ public class ClientApi {
         });
     }
 
-    public static void requestDelete1(int id, Context context) {
+    public static void requestDeleteService(int id, Context context) {
 
         OkHttpClient client = new OkHttpClient();
 
@@ -198,7 +198,30 @@ public class ClientApi {
                 .build();
 
         final Request request = new Request.Builder()
-                .url(URLS.confirm_delete + id + "/")
+                .url(URLS.services_delete + id + "/")
+                .delete()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Call call, @NonNull Response response) throws IOException {
+
+            }
+        });
+    }
+
+    public static void requestDelete1(String url,int id, Context context) {
+
+        OkHttpClient client = new OkHttpClient();
+
+        RequestBody requestBody = new FormBody.Builder()
+                .build();
+
+        final Request request = new Request.Builder()
+                .url(url + id + "/")
                 .delete()
                 .build();
         client.newCall(request).enqueue(new Callback() {

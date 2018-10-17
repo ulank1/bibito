@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.R;
+import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.helpers.Shared;
 
@@ -72,7 +73,7 @@ public class RVMyOrderSecondAdapter extends RecyclerView.Adapter<RVMyOrderSecond
             cancel.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ClientApi.requestDelete1(listVse.get(getAdapterPosition()).getId(),context);
+                    ClientApi.requestDelete1(URLS.confirm_delete,listVse.get(getAdapterPosition()).getId(),context);
                     listVse.remove(getAdapterPosition());
                     notifyDataSetChanged();
                 }

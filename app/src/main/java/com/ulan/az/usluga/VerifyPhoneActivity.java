@@ -54,17 +54,9 @@ public class VerifyPhoneActivity extends AppCompatActivity {
         //and sending the verification code to the number
         Intent intent = getIntent();
         mobile = intent.getStringExtra("mobile");
-        if (mobile.startsWith("0")){
-            Log.e("LLL","LLL");
-            mobile = mobile.replaceFirst("0","");
-        }else if (mobile.startsWith("996")){
-           mobile = mobile.replaceFirst("996","");
-        }
+
         sendVerificationCode(mobile);
-
-        Log.e("mobile",mobile);
-
-        Shared.mobile = "996"+mobile;
+        Shared.mobile = mobile;
 
         //if the automatic sms detection did not work, user can also enter the code manually
         //so adding a click listener to the button
@@ -90,7 +82,7 @@ public class VerifyPhoneActivity extends AppCompatActivity {
     //you can take the country id as user input as well
     private void sendVerificationCode(String mobile) {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                "+996" + mobile,
+                "+" + mobile,
                 60,
                 TimeUnit.SECONDS,
                 TaskExecutors.MAIN_THREAD,
@@ -178,7 +170,7 @@ public class VerifyPhoneActivity extends AppCompatActivity {
                                 }
                             };
 
-                            ClientApi.requestGet(URLS.users+"&phone=996"+mobile,listener);
+                            ClientApi.requestGet(URLS.users+"&phone="+mobile,listener);
 
                         } else {
 

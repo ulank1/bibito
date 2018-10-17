@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.rilixtech.CountryCodePicker;
+
 public class VerifyActivity extends AppCompatActivity {
 
 
@@ -15,6 +17,7 @@ public class VerifyActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify);
+        final CountryCodePicker countryCodePicker = findViewById(R.id.ccp);
 
         editTextMobile = findViewById(R.id.editTextMobile);
 
@@ -22,7 +25,7 @@ public class VerifyActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String mobile = editTextMobile.getText().toString().trim();
+                String mobile =countryCodePicker.getSelectedCountryCode()+editTextMobile.getText().toString().trim();
 //
 //                if(mobile.isEmpty() || mobile.length() < 10){
 //                    editTextMobile.setError("Enter a valid mobile");

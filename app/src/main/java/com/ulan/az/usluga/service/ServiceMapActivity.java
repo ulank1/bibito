@@ -76,7 +76,7 @@ public class ServiceMapActivity extends AppCompatActivity {
                             else service.setGeoPoint(new GeoPoint(0,0));                            service.setImage(object.getString("image"));
                             if (object.has("description"))
                                 service.setDescription(object.getString("description"));
-                            service.setCategory(object.getJSONObject("sub_category").getString("sub_category"));
+                            service.setCategory(object.getJSONObject("sub_category").getJSONObject("category").getString("category")+" -> "+object.getJSONObject("sub_category").getString("sub_category"));
                             User user = new User();
                             JSONObject jsonUser = object.getJSONObject("user");
                             user.setAge(jsonUser.getString("age"));

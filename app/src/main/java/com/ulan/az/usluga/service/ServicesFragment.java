@@ -22,11 +22,13 @@ import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.FilterListener;
 import com.ulan.az.usluga.Main2Activity;
 import com.ulan.az.usluga.R;
+import com.ulan.az.usluga.Searchlistener;
 import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.helpers.DataHelper;
 import com.ulan.az.usluga.helpers.E;
 import com.ulan.az.usluga.helpers.Shared;
+import com.ulan.az.usluga.order.RVOrderAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +40,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ServicesFragment extends Fragment implements FilterListener {
+public class ServicesFragment extends Fragment implements FilterListener, Searchlistener {
 
     RecyclerView mRecyclerView;
 
@@ -79,7 +81,7 @@ public class ServicesFragment extends Fragment implements FilterListener {
             @Override
             public void onClick(View v) {
                 //Log.e("eee","eee");
-                startActivity(new Intent(getActivity(),AddServiceActivity.class));
+                startActivity(new Intent(getActivity(), AddServiceActivity.class));
             }
         });
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
@@ -101,14 +103,14 @@ public class ServicesFragment extends Fragment implements FilterListener {
                             Service service = new Service();
                             service.setAddress(object.getString("address"));
                             if (!object.isNull("experience"))
-                            service.setExperience(object.getDouble("experience"));
+                                service.setExperience(object.getDouble("experience"));
                             if (!object.isNull("lat"))
                                 service.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
-                            else service.setGeoPoint(new GeoPoint(0,0));
+                            else service.setGeoPoint(new GeoPoint(0, 0));
                             service.setImage(object.getString("image"));
                             if (object.has("description"))
                                 service.setDescription(object.getString("description"));
-                            service.setCategory(object.getJSONObject("sub_category").getString("sub_category"));
+                            service.setCategory(object.getJSONObject("sub_category").getJSONObject("category").getString("category")+" -> "+object.getJSONObject("sub_category").getString("sub_category"));
                             service.setId(object.getInt("id"));
                             User user = new User();
                             JSONObject jsonUser = object.getJSONObject("user");
@@ -116,11 +118,13 @@ public class ServicesFragment extends Fragment implements FilterListener {
                             user.setImage(jsonUser.getString("image"));
                             user.setName(jsonUser.getString("name"));
                             user.setPhone(jsonUser.getString("phone"));
+                            user.setId(jsonUser.getInt("id"));
                             service.setUser(user);
 
                             serviceArrayList.add(service);
 
                         }
+                        Shared.serviceCategories = serviceArrayList;
                         adapter = new RVServiceAdapter(getContext(), serviceArrayList);
 
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -139,16 +143,15 @@ public class ServicesFragment extends Fragment implements FilterListener {
             }
         };
         progressBar.setVisibility(View.VISIBLE);
-        if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED,getContext())) {
+        if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED, getContext())) {
             Log.e("Category_id", Shared.category_id + "");
             ClientApi.requestGet(URLS.services + "&sub_category=" + Shared.category_id, listener);
-        }
-        else ClientApi.requestGet(URLS.services, listener);
+        } else ClientApi.requestGet(URLS.services, listener);
 
 
         Main2Activity activity = (Main2Activity) getActivity();
 
-        activity.setServiceApiListener(this);
+        activity.setServiceApiListener(this, this);
 
         return view;
     }
@@ -156,15 +159,25 @@ public class ServicesFragment extends Fragment implements FilterListener {
 
     @Override
     public void onFilter(int id) {
-        Log.e("Category_id",Shared.category_id+"");
+        Log.e("Category_id", Shared.category_id + "");
         progressBar.setVisibility(View.VISIBLE);
 
-        if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED,getContext())) {
+        if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED, getContext())) {
             Log.e("Category_id", Shared.category_id + "");
             ClientApi.requestGet(URLS.services + "&sub_category=" + Shared.category_id, listener);
-        }
-        else ClientApi.requestGet(URLS.services, listener);
+        } else ClientApi.requestGet(URLS.services, listener);
 
     }
 
+
+    @Override
+    public void onSearch(ArrayList<Service> services) {
+        Log.e("SIII",services.size()+"");
+        if (services.size()>0) {
+            adapter = new RVServiceAdapter(getContext(), services);
+            progressBar.setVisibility(View.GONE);
+            mRecyclerView.setAdapter(adapter);
+        }
+
+    }
 }

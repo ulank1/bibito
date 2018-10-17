@@ -3,6 +3,8 @@ package com.ulan.az.usluga.helpers;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 
@@ -75,6 +77,22 @@ public class E {
         return s;
     }
 
+    public static boolean checkInternetConection(Context context){
+        ConnectivityManager mgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = mgr.getActiveNetworkInfo();
 
+        if (netInfo != null) {
+            if (netInfo.isConnected()) {
+                return true;
+                // Internet Available
+            }else {
+                return false;
+                //No internet
+            }
+        } else {
+            return false;
+            //No internet
+        }
+    }
 
 }

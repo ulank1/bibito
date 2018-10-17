@@ -75,7 +75,7 @@ public class RVCommentAdapter extends RecyclerView.Adapter<RVCommentAdapter.Pers
         if (vse.getUser().getId()== E.getAppPreferencesINT(E.APP_PREFERENCES_ID,context)){
             personViewHolder.each.setVisibility(View.GONE);
             personViewHolder.own.setVisibility(View.VISIBLE);
-            personViewHolder.user1.setText(vse.getUser().getName());
+            personViewHolder.user1.setText(vse.getDate());
             personViewHolder.comment1.setText(vse.getComment());
         }else {
             personViewHolder.each.setVisibility(View.VISIBLE);

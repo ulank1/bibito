@@ -61,6 +61,7 @@ public class MyForumActivity extends AppCompatActivity {
                             service.setId(object.getInt("id"));
                             service.setTitle(object.getString("title"));
                             service.setCount(object.getInt("count"));
+                            service.setDescription(object.getString("description"));
 
                             orders.add(service);
 

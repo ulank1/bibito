@@ -78,7 +78,7 @@ public class CategoryFragment extends Fragment {
                         }
                         //Log.e("size", serviceArrayList.size() + "");
 
-                        Shared.orderCategories = serviceArrayList;
+                       // Shared.orderCategories = serviceArrayList;
 
                         adapter = new RVCategoryAdapter(getActivity(), serviceArrayList, getArguments().getInt("tag"));
                         getActivity().runOnUiThread(new Runnable() {

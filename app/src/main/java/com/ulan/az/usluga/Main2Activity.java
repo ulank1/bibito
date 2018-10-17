@@ -16,6 +16,8 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,10 +26,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -39,6 +45,7 @@ import com.ulan.az.usluga.Category.Category;
 import com.ulan.az.usluga.Profile.FavoritesActivity;
 import com.ulan.az.usluga.Profile.MyForumActivity;
 import com.ulan.az.usluga.Profile.MyOrderActivity;
+import com.ulan.az.usluga.Profile.MyServiceActivity;
 import com.ulan.az.usluga.Profile.ProfileActivity;
 import com.ulan.az.usluga.forum.ForumCategoryFragment;
 import com.ulan.az.usluga.helpers.E;
@@ -46,6 +53,7 @@ import com.ulan.az.usluga.helpers.Shared;
 import com.ulan.az.usluga.helpers.ViewPagerAdapter;
 import com.ulan.az.usluga.order.OrderFragment;
 import com.ulan.az.usluga.order.OrderMapActivity;
+import com.ulan.az.usluga.service.Service;
 import com.ulan.az.usluga.service.ServiceMapActivity;
 import com.ulan.az.usluga.service.ServicesFragment;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -68,21 +76,28 @@ public class Main2Activity extends AppCompatActivity
     ArrayList<String> serviceArrayList;
     ArrayList<Category> categoryArrayList;
     ArrayList<Category> subCategoryArrayList;
-    ImageView filter, imgMap;
+    ImageView filter, imgMap,imgSearch;
     Switch switch_filter;
     RelativeLayout relativeLayout;
     Context context;
+    EditText editSearch;
     int count = 0;
+    Searchlistener searchlistenerService,searchlistenerOrder;
+    LinearLayout lineSearch;
+    RelativeLayout relativeRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         context = this;
+        category = (Spinner) findViewById(R.id.category);
+        subCategory = (Spinner) findViewById(R.id.sub_category);
         Log.e("ddd",E.getAppPreferences(E.APP_PREFERENCES_PHOTO,context)+"kk");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -116,8 +131,68 @@ public class Main2Activity extends AppCompatActivity
         relativeLayout = findViewById(R.id.relative);
         filter = findViewById(R.id.filter);
         imgMap = findViewById(R.id.map);
+        editSearch = findViewById(R.id.edit_search);
+        lineSearch = findViewById(R.id.line1);
+        imgSearch = findViewById(R.id.search);
+        relativeRefresh = findViewById(R.id.relative_refresh);
 
         checkPermissionsState();
+
+        imgSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                relativeLayout.setVisibility(View.GONE);
+
+                if (lineSearch.getVisibility()==View.GONE){
+                    lineSearch.setVisibility(View.VISIBLE);
+                }else {
+                    lineSearch.setVisibility(View.GONE);
+                }
+
+            }
+        });
+
+        editSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    String query = v.getText().toString();
+                    if (viewPager.getCurrentItem() == 0) {
+                        ArrayList<Service> categories = new ArrayList<>();
+
+                        for (Service category : Shared.serviceCategories) {
+                            String s = category.getDescription().toLowerCase();
+                            if (s.contains(query.toLowerCase())) {
+                                categories.add(category);
+                            }
+                        }
+                        searchlistenerService.onSearch(categories);
+                    } else if (viewPager.getCurrentItem() == 1) {
+                        ArrayList<Service> categories = new ArrayList<>();
+
+                        for (Service category : Shared.orderCategories) {
+                            String s = category.getDescription().toLowerCase();
+                            if (s.contains(query.toLowerCase())) {
+                                categories.add(category);
+                            }
+                        }
+                        searchlistenerOrder.onSearch(categories);
+                    }
+
+                    InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                    lineSearch.setVisibility(View.GONE);
+                    editSearch.setText("");
+                    return true;
+                }
+                return false;
+            }
+
+
+        });
 
 
         imgMap.setOnClickListener(new View.OnClickListener() {
@@ -148,79 +223,66 @@ public class Main2Activity extends AppCompatActivity
         switch_filter.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                E.setAppPreferences(E.APP_PREFERENCES_FILTER_IS_CHECKED, context, isChecked);
+
+                if (isChecked) {
+                    filter.setImageResource(R.drawable.ic_filter);
+                    if (viewPager.getCurrentItem()==0){
+                        serviceApiListener.onFilter(0);
+                    }else if (viewPager.getCurrentItem()==1) {
+                        orderApiListener.onFilter(0);
+                    }
 
 
 
-                    E.setAppPreferences(E.APP_PREFERENCES_FILTER_IS_CHECKED, context, isChecked);
+                } else {
+                    filter.setImageResource(R.drawable.ic_filter_passive);
 
-                    if (isChecked) {
-                        filter.setImageResource(R.drawable.ic_filter);
-                        if (viewPager.getCurrentItem()==0){
-                            serviceApiListener.onFilter(0);
-                        }else if (viewPager.getCurrentItem()==1) {
-                            orderApiListener.onFilter(0);
-                        }
-
-
-
-                    } else {
-                        filter.setImageResource(R.drawable.ic_filter_passive);
-
-                        if (viewPager.getCurrentItem()==0){
-                            serviceApiListener.onFilter(0);
-                        }else  if (viewPager.getCurrentItem()==1) {
-                            orderApiListener.onFilter(0);
-                        }
+                    if (viewPager.getCurrentItem()==0){
+                        serviceApiListener.onFilter(0);
+                    }else  if (viewPager.getCurrentItem()==1) {
+                        orderApiListener.onFilter(0);
                     }
                 }
-
+            }
         });
 
         filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (relativeLayout.getVisibility() == View.GONE)
+                lineSearch.setVisibility(View.GONE);
+                if (relativeLayout.getVisibility() == View.GONE) {
                     relativeLayout.setVisibility(View.VISIBLE);
+                }
                 else relativeLayout.setVisibility(View.GONE);
             }
         });
 
-        /*searchView = (MaterialSearchView) findViewById(R.id.search_view);
+        searchView = (MaterialSearchView) findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //Log.e("SERA","ddd");
                 if (viewPager.getCurrentItem() == 0) {
-                    ArrayList<Category> categories = new ArrayList<>();
+                    ArrayList<Service> categories = new ArrayList<>();
 
-                    for (Category category : Shared.orderCategories) {
+                    for (Service category : Shared.serviceCategories) {
                         String s = category.getCategory().toLowerCase();
                         if (s.contains(query.toLowerCase())) {
                             categories.add(category);
                         }
                     }
-                    serviceApiListener.onFilter(categories);
+                    searchlistenerService.onSearch(categories);
                 } else if (viewPager.getCurrentItem() == 1) {
-                    ArrayList<Category> categories = new ArrayList<>();
+                    ArrayList<Service> categories = new ArrayList<>();
 
-                    for (Category category : Shared.orderCategories) {
+                    for (Service category : Shared.orderCategories) {
                         String s = category.getCategory().toLowerCase();
                         if (s.contains(query.toLowerCase())) {
                             categories.add(category);
                         }
                     }
-                    orderApiListener.onFilter(categories);
-                } else if (viewPager.getCurrentItem() == 2) {
-                    ArrayList<Category> categories = new ArrayList<>();
-
-                    for (Category category : Shared.forumCategories) {
-                        String s = category.getCategory().toLowerCase();
-                        if (s.contains(query.toLowerCase())) {
-                            categories.add(category);
-                        }
-                    }
-                    forumListener.onFilter(categories);
-
+                    searchlistenerOrder.onSearch(categories);
                 }
 
 
@@ -234,7 +296,6 @@ public class Main2Activity extends AppCompatActivity
                 return true;
             }
         });
-*/
 
         fm = getSupportFragmentManager();
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -286,6 +347,16 @@ public class Main2Activity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!E.checkInternetConection(context)){
+            relativeRefresh.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -297,7 +368,7 @@ public class Main2Activity extends AppCompatActivity
         }
     }
 
-    /*@Override
+ /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main2, menu);
@@ -307,9 +378,9 @@ public class Main2Activity extends AppCompatActivity
         searchView.setMenuItem(item);
 
         return true;
-    }
+    }*/
 
-    @Override
+      /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -337,6 +408,9 @@ public class Main2Activity extends AppCompatActivity
 
         } else if (id == R.id.nav_forum) {
             startActivity(new Intent(Main2Activity.this, MyForumActivity.class));
+
+        } else if (id == R.id.nav_services) {
+            startActivity(new Intent(Main2Activity.this, MyServiceActivity.class));
 
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -442,12 +516,14 @@ public class Main2Activity extends AppCompatActivity
         }
     }
 
-    public void setOrderApiListener(FilterListener orderApiListener) {
+    public void setOrderApiListener(FilterListener orderApiListener, Searchlistener searchlistener) {
         this.orderApiListener = orderApiListener;
+        this.searchlistenerOrder = searchlistener;
     }
 
-    public void setServiceApiListener(FilterListener serviceApiListener) {
+    public void setServiceApiListener(FilterListener serviceApiListener, Searchlistener searchlistener) {
         this.serviceApiListener = serviceApiListener;
+        this.searchlistenerService = searchlistener;
     }
 
     public void setForumApiListener(FilterListener serviceApiListener) {
@@ -461,8 +537,7 @@ public class Main2Activity extends AppCompatActivity
 
 
     public void initspinner() {
-        category = (Spinner) findViewById(R.id.category);
-        subCategory = (Spinner) findViewById(R.id.sub_category);
+
 
 
 
@@ -549,8 +624,13 @@ public class Main2Activity extends AppCompatActivity
 
                         }
                     };
-
+                    if (viewPager.getCurrentItem()==1)
                     ClientApi.requestGet(URLS.sub_category + "&category=" + categoryArrayList.get(position - 1).getId(), listener);
+                    else if (viewPager.getCurrentItem()==1){
+                        ClientApi.requestGet(URLS.sub_category_service + "&category=" + categoryArrayList.get(position - 1).getId(), listener);
+
+                    }
+
                 }
             }
 
@@ -596,6 +676,7 @@ public class Main2Activity extends AppCompatActivity
                             @Override
                             public void run() {
                                 category.setAdapter(adapter);
+
                                 category.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_CATEGORY,context));
                             }
                         });
@@ -608,15 +689,80 @@ public class Main2Activity extends AppCompatActivity
             }
         };
 
-        ClientApi.requestGet(URLS.category, listener1);
+        if (viewPager!=null) {
+            if (viewPager.getCurrentItem() == 1)
+                ClientApi.requestGet(URLS.category, listener1);
+            else if (viewPager.getCurrentItem() == 0)
+                ClientApi.requestGet(URLS.category_service, listener1);
+        }else ClientApi.requestGet(URLS.category_service, listener1);
+    }
 
+
+    public void initSpinnerData(){
+        ClientApiListener listener1 = new ClientApiListener() {
+            @SuppressLint("ResourceType")
+            @Override
+            public void onApiResponse(String id, String json, boolean isOk) {
+                Log.e("SSSS",json);
+                if (isOk) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(json);
+                        serviceArrayList = new ArrayList<>();
+                        categoryArrayList = new ArrayList<>();
+                        JSONArray jsonArray = jsonObject.getJSONArray("objects");
+                        serviceArrayList.add("Категория");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject object = jsonArray.getJSONObject(i);
+
+                            Category category1 = new Category();
+                            category1.setCategory(object.getString("category"));
+                            category1.setId(object.getInt("id"));
+                            categoryArrayList.add(category1);
+
+                            serviceArrayList.add(object.getString("category"));
+                            // Настраиваем адаптер
+
+                        }
+
+                        String[] s = serviceArrayList.toArray(new String[serviceArrayList.size()]);
+
+                        final ArrayAdapter<String> adapter;
+                        adapter = new ArrayAdapter<String>(Main2Activity.this, android.R.layout.simple_spinner_item, s);
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+// Вызываем адаптер
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                category.setAdapter(adapter);
+                                category.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_CATEGORY,context));
+                            }
+                        });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+
+                    }
+                }
+
+            }
+        };
+
+        if (viewPager!=null) {
+            if (viewPager.getCurrentItem() == 1)
+                ClientApi.requestGet(URLS.category, listener1);
+            else if (viewPager.getCurrentItem() == 0)
+                ClientApi.requestGet(URLS.category_service, listener1);
+        }else ClientApi.requestGet(URLS.category_service, listener1);
     }
 
     public void onChanePagePosition(int position) {
+        initSpinnerData();
         relativeLayout.setVisibility(View.GONE);
+        lineSearch.setVisibility(View.GONE);
         if (position != 2) {
             filter.setVisibility(View.VISIBLE);
             imgMap.setVisibility(View.VISIBLE);
+            imgSearch.setVisibility(View.VISIBLE);
             if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED, this)) {
                 filter.setImageResource(R.drawable.ic_filter);
             } else {
@@ -625,9 +771,15 @@ public class Main2Activity extends AppCompatActivity
         } else {
             filter.setVisibility(View.GONE);
             imgMap.setVisibility(View.GONE);
+            imgSearch.setVisibility(View.GONE);
         }
     }
 
 
+    public void onClickRefresh(View view) {
 
+        Intent intent = getIntent();
+        startActivity(intent);
+        finish();
+    }
 }

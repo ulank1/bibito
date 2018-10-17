@@ -81,11 +81,14 @@
                     android:textColor="#000" />
 
 
-                <org.osmdroid.views.MapView
+                <com.ulan.az.usluga.MapViewO
                     android:id="@+id/mapView"
                     android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"></org.osmdroid.views.MapView>
+                    android:layout_height="200dp">
+
+
+                </com.ulan.az.usluga.MapViewO>
 
                 <Button
                     android:layout_marginTop="20dp"

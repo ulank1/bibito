@@ -1,6 +1,7 @@
 package com.ulan.az.usluga.Profile;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.R;
+import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.helpers.Shared;
 
@@ -82,7 +84,7 @@ public class RVMyForumSecondAdapter extends RecyclerView.Adapter<RVMyForumSecond
             cancel.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ClientApi.requestDelete1(listVse.get(getAdapterPosition()).getId(),context);
+                    ClientApi.requestDelete1(URLS.confirmation_delete,listVse.get(getAdapterPosition()).getId(),context);
                     listVse.remove(getAdapterPosition());
                     notifyDataSetChanged();
                 }

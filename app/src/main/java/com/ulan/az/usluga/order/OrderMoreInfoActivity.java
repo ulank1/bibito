@@ -4,12 +4,17 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,9 +22,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.MapActivity;
+import com.ulan.az.usluga.MapViewO;
 import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.helpers.E;
@@ -53,7 +60,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
     Button button,buttonCall;
     AlertDialog.Builder ad;
     Service service;
-    MapView mapView;
+    MapViewO mapView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,12 +71,13 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
         button = findViewById(R.id.btn_add);
         buttonCall = findViewById(R.id.btn_call);
         TextView description = findViewById(R.id.desc);
-        mapView = (MapView) findViewById(R.id.mapView);
+        mapView = findViewById(R.id.mapView);
         mapView.setClickable(true);
         mapView.setBuiltInZoomControls(false);
         mapView.setMultiTouchControls(true);
         mapView.getController().setZoom(15);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
+
         ad = new AlertDialog.Builder(this);
         ad.setTitle("Чтобы предложить услугу, вы должны создать услугу");  // заголовок
         ad.setMessage("Хотите добавить услугу");
@@ -120,6 +128,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
 
                         if (!json.isEmpty()&&isOk){
                             try {
+                                Log.e("LAN",json);
                                 JSONObject jsonObject = new JSONObject(json);
                                 JSONArray jsonArray = jsonObject.getJSONArray("objects");
                                 if (jsonArray.length()>0){
@@ -131,6 +140,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                                                 runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {
+                                                        button.setVisibility(View.GONE);
                                                         Toast.makeText(OrderMoreInfoActivity.this, "Отправлено", Toast.LENGTH_SHORT).show();
                                                         send();
 
@@ -162,7 +172,8 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                         }
                     }
                 };
-                ClientApi.requestGet(URLS.services+"&sub_category="+Shared.category_id+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, OrderMoreInfoActivity.this)),listener);
+                Log.e("DDDDDD","&sub_category="+Shared.category_id+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, OrderMoreInfoActivity.this)));
+                ClientApi.requestGet(URLS.services+"&sub_category="+Shared.category_id_order+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, OrderMoreInfoActivity.this)),listener);
             }
         });
 
@@ -173,8 +184,15 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
         }
         name.setText(service.getUser().getName() + "");
 
-        Glide.with(this).load("http://145.239.33.4:5555" + service.getImage()).placeholder(R.drawable.placeholder_image).into(avatar);
-
+        Glide.with(this).load("http://145.239.33.4:5555"+service.getUser().getImage()).asBitmap().centerCrop().into(new BitmapImageViewTarget(avatar) {
+            @Override
+            protected void setResource(Bitmap resource) {
+                RoundedBitmapDrawable circularBitmapDrawable =
+                        RoundedBitmapDrawableFactory.create(getResources(), resource);
+                circularBitmapDrawable.setCircular(true);
+                avatar.setImageDrawable(circularBitmapDrawable);
+            }
+        });
         ImageView btnAddress = findViewById(R.id.btn_address);
         btnAddress.setOnClickListener(new View.OnClickListener() {
             @Override

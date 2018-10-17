@@ -21,10 +21,12 @@ import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.FilterListener;
 import com.ulan.az.usluga.Main2Activity;
 import com.ulan.az.usluga.R;
+import com.ulan.az.usluga.Searchlistener;
 import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.helpers.E;
 import com.ulan.az.usluga.helpers.Shared;
+import com.ulan.az.usluga.service.RVServiceAdapter;
 import com.ulan.az.usluga.service.Service;
 
 import org.json.JSONArray;
@@ -37,7 +39,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class OrderFragment extends Fragment implements FilterListener {
+public class OrderFragment extends Fragment implements FilterListener, Searchlistener {
 
     RecyclerView mRecyclerView;
 
@@ -103,6 +105,8 @@ public class OrderFragment extends Fragment implements FilterListener {
                             service.setId(object.getInt("id"));
                             service.setImage(object.getString("image"));
                             service.setCategory(object.getJSONObject("sub_category").getString("sub_category"));
+                            Shared.category_id_order =object.getJSONObject("sub_category").getInt("id");
+
                             User user = new User();
                             JSONObject jsonUser = object.getJSONObject("user");
                             user.setAge(jsonUser.getString("age"));
@@ -116,6 +120,7 @@ public class OrderFragment extends Fragment implements FilterListener {
                             serviceArrayList.add(service);
 
                         }
+                        Shared.orderCategories = serviceArrayList;
                         adapter = new RVOrderAdapter(getContext(),serviceArrayList);
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
@@ -139,7 +144,7 @@ public class OrderFragment extends Fragment implements FilterListener {
 
         Main2Activity activity = (Main2Activity) getActivity();
 
-        activity.setOrderApiListener(this);
+        activity.setOrderApiListener(this,this);
 
         return view;
     }
@@ -151,6 +156,15 @@ public class OrderFragment extends Fragment implements FilterListener {
         if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED,getContext()))
             ClientApi.requestGet(URLS.order+"&status=1&sub_category="+ Shared.category_id,listener);
         else         ClientApi.requestGet(URLS.order+"&status=1",listener);
+
+    }
+    @Override
+    public void onSearch(ArrayList<Service> services) {
+        if (services.size()>0) {
+            adapter = new RVOrderAdapter(getContext(), services);
+            progressBar.setVisibility(View.GONE);
+            mRecyclerView.setAdapter(adapter);
+        }
 
     }
 }

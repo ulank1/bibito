@@ -8,6 +8,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -24,7 +25,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ForumActivity extends AppCompatActivity {
 
@@ -90,6 +94,9 @@ public class ForumActivity extends AppCompatActivity {
                             forum.setDescription(object.getString("description"));
                             forum.setImage(object.getString("image"));
                             forum.setTitle(object.getString("title"));
+                            String date = object.getString("updated_at");
+
+                            forum.setDate(parseDate(date));
 
                             User user = new User();
                             JSONObject jsonUser = object.getJSONObject("user");
@@ -122,7 +129,7 @@ public class ForumActivity extends AppCompatActivity {
         };
         progressBar.setVisibility(View.VISIBLE);
 
-        ClientApi.requestGet(URLS.forum/* + "&sub_category=" + category.getId()*/, listener);
+        ClientApi.requestGet(URLS.forum + "&sub_category=" + category.getId(), listener);
 
 
         searchView = (MaterialSearchView) findViewById(R.id.search_view);
@@ -173,7 +180,7 @@ public class ForumActivity extends AppCompatActivity {
 
     }
 
- /*   @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_category, menu);
@@ -183,7 +190,7 @@ public class ForumActivity extends AppCompatActivity {
         searchView.setMenuItem(item);
 
         return true;
-    }*/
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -191,5 +198,22 @@ public class ForumActivity extends AppCompatActivity {
         if (id == android.R.id.home)
             finish();
         return true;
+    }
+
+
+    public String parseDate(String inputDate) {
+        String DATE_FORMAT_I = "yyyy-MM-dd'T'HH:mm:ss";
+        String DATE_FORMAT_O = "yyyy-MM-dd. HH:mm";
+
+        SimpleDateFormat formatInput = new SimpleDateFormat(DATE_FORMAT_I);
+        SimpleDateFormat formatOutput = new SimpleDateFormat(DATE_FORMAT_O);
+        Date date = null;
+        try {
+            date = formatInput.parse(inputDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String dateString = formatOutput.format(date);
+        return dateString;
     }
 }

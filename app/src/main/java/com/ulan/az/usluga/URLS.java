@@ -10,10 +10,13 @@ public class URLS {
     public static String users = root+"api/v1/users/?format=json";
     public static String users_put = root+"api/v1/users/";
     public static String services = root+"api/v1/service/?format=json";
+    public static String services_delete = root+"api/v1/service/";
     public static String order = root+"api/v1/order/?format=json";
     public static String order_delete = root+"api/v1/order/";
     public static String category = root+"api/v1/category/?format=json";
+    public static String category_service = root+"api/v1/category_service/?format=json";
     public static String sub_category = root+"api/v1/subcategory/?format=json";
+    public static String sub_category_service = root+"api/v1/subcategory_service/?format=json";
     public static String forum_sub_category = root+"api/v1/forumsubcategory/?format=json";
     public static String forum_category = root+"api/v1/forumcategory/?format=json";
     public static String forum = root+"api/v1/forum1/?format=json";

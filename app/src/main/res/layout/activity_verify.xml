@@ -14,29 +14,51 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp">
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <EditText
+
+        <TextView
+            android:id="@+id/ff"
             android:gravity="center"
+            android:text="Ввести номер телефона"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.rilixtech.CountryCodePicker
+            android:layout_below="@+id/ff"
+            android:id="@+id/ccp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:ccp_defaultCode="98"
+            app:ccp_hideNameCode="true"
+            app:ccp_showFlag="false"
+            app:ccp_showFullName="false" />
+
+        <EditText
+            android:layout_below="@+id/ff"
+            android:layout_toRightOf="@+id/ccp"
+            android:background="@null"
             android:id="@+id/editTextMobile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:drawablePadding="10dp"
-            android:hint="Ввести номер телефона"
+            android:hint=""
             android:inputType="number"
             />
-        </android.support.design.widget.TextInputLayout>
+
+        <View
+            android:layout_below="@+id/ccp"
+            android:background="#555"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
 
         <Button
+
             android:paddingLeft="25dp"
             android:paddingRight="25dp"
             android:id="@+id/buttonContinue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/text"
+            android:layout_below="@id/ccp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"
             android:background="@drawable/btn_back_dark"

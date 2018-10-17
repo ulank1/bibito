@@ -19,6 +19,7 @@ import com.ulan.az.usluga.service.Service;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 
@@ -57,10 +58,22 @@ public class MyOrderActivity extends AppCompatActivity {
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
                             Service service = new Service();
+                            service.setAddress(object.getString("address"));
+                            if (!object.isNull("lat"))
+                                service.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
+                            else service.setGeoPoint(new GeoPoint(0, 0));
+                            service.setImage(object.getString("image"));
+                            if (object.has("description"))
+                                service.setDescription(object.getString("description"));
+                            service.setCategory(object.getJSONObject("sub_category").getJSONObject("category").getString("category")+" -> "+object.getJSONObject("sub_category").getString("sub_category"));
                             service.setId(object.getInt("id"));
-                            service.setCategory(object.getJSONObject("sub_category").getString("sub_category"));
-
-
+                            User user = new User();
+                            JSONObject jsonUser = object.getJSONObject("user");
+                            user.setAge(jsonUser.getString("age"));
+                            user.setImage(jsonUser.getString("image"));
+                            user.setName(jsonUser.getString("name"));
+                            user.setPhone(jsonUser.getString("phone"));
+                            service.setUser(user);
                             orders.add(service);
 
                         }
@@ -74,7 +87,7 @@ public class MyOrderActivity extends AppCompatActivity {
                         public void onApiResponse(String id, String json, boolean isOk) {
 
                             ArrayList<User> users1 = new ArrayList<>();
-                            users = new ArrayList<>();
+
                             JSONObject jsonObject = null;
                             try {
                                 jsonObject = new JSONObject(json);
@@ -93,6 +106,7 @@ public class MyOrderActivity extends AppCompatActivity {
                                     user.setPhone(jsonUser.getString("phone"));
                                     user.setDeviceId(jsonUser.getString("device_id"));
                                     users1.add(user);
+
                                 }
                                 users.add(users1);
 
@@ -116,6 +130,9 @@ public class MyOrderActivity extends AppCompatActivity {
 
                         }
                     };
+
+
+                    users = new ArrayList<>();
                     if (orders.size()>0)
                     ClientApi.requestGet(URLS.confirm + "&order=" + orders.get(a).getId(), listener1);
 

@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 public class Forum implements Serializable{
 
-    String title,description,image;
+    String title,description,image,date;
     int count,id;
     User user;
 
@@ -60,5 +60,13 @@ public class Forum implements Serializable{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

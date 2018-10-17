@@ -59,7 +59,7 @@ public class DataHelper extends SQLiteOpenHelper {
     public void addService(Service service){
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(SERVICE_ID, service.getId());
+        contentValues.put(SERVICE_ID, service.getUser().getId());
         contentValues.put(SERVICE_LAT, service.getGeoPoint().getLatitude());
         contentValues.put(SERVICE_LON, service.getGeoPoint().getLongitude());
         contentValues.put(SERVICE_EXPERIENCE, service.getExperience());

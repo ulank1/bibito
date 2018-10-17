@@ -1,6 +1,7 @@
 package com.ulan.az.usluga.Profile;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -32,7 +33,7 @@ public class RVMyForumAdapter extends RecyclerView.Adapter<RVMyForumAdapter.Pers
 
        TextView category;
         TextView countText;
-       ImageView imageView;
+       ImageView imageView,redactor;
        DataHelper dataHelper;
        RecyclerView mRecyclerView;
        LinearLayout line2;
@@ -48,6 +49,19 @@ public class RVMyForumAdapter extends RecyclerView.Adapter<RVMyForumAdapter.Pers
             line2 = (LinearLayout) itemView.findViewById(R.id.line2);
 
             dataHelper = new DataHelper(context);
+
+            redactor = (ImageView) itemView.findViewById(R.id.redactor);
+
+            redactor.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context,RedactorForumActivity.class);
+                    intent.putExtra("service",listVse.get(getAdapterPosition()));
+                    context.startActivity(intent);
+                }
+            });
+
+
             category.setVisibility(View.VISIBLE);
             imageView.setOnClickListener(new OnClickListener() {
                 @Override

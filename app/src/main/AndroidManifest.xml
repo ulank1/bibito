@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
@@ -14,25 +16,25 @@
         android:roundIcon="@drawable/order_service_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.ulan.az.usluga.VerifyActivity" />
-        <activity android:name="com.ulan.az.usluga.VerifyPhoneActivity" />
-        <activity android:name="com.ulan.az.usluga.LoginActivity" />
+        <activity android:name=".VerifyActivity" />
+        <activity android:name=".VerifyPhoneActivity" />
+        <activity android:name=".LoginActivity" />
         <activity
-            android:name="com.ulan.az.usluga.MainActivity"
+            android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.ulan.az.usluga.service.ServiceActivity"
+            android:name=".service.ServiceActivity"
             android:theme="@style/NoActionBar" />
-        <activity android:name="com.ulan.az.usluga.service.ServiceMoreInfoActivity" />
-        <activity android:name="com.ulan.az.usluga.order.OrderMoreInfoActivity" />
+        <activity android:name=".service.ServiceMoreInfoActivity" />
+        <activity android:name=".order.OrderMoreInfoActivity" />
         <activity
-            android:name="com.ulan.az.usluga.order.OrderActivity"
+            android:name=".order.OrderActivity"
             android:theme="@style/NoActionBar" />
-        <activity android:name="com.ulan.az.usluga.order.AddOrderActivity" />
-        <activity android:name="com.ulan.az.usluga.service.AddServiceActivity" />
-        <activity android:name="com.ulan.az.usluga.order.AddressActivity" />
+        <activity android:name=".order.AddOrderActivity" />
+        <activity android:name=".service.AddServiceActivity" />
+        <activity android:name=".order.AddressActivity" />
         <activity
-            android:name="com.ulan.az.usluga.SplashActivity"
+            android:name=".SplashActivity"
             android:theme="@style/NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,40 +42,44 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.ulan.az.usluga.Profile.FavoritesActivity" />
+        <activity android:name=".Profile.FavoritesActivity" />
         <activity
-            android:name="com.ulan.az.usluga.SubCategory.SubCategoryActivity"
+            android:name=".SubCategory.SubCategoryActivity"
             android:theme="@style/NoActionBar" />
         <activity
-            android:name="com.ulan.az.usluga.Main2Activity"
+            android:name=".Main2Activity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name="com.ulan.az.usluga.FirebaseInstanceIDService">
+        <service android:name=".FirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-        <service android:name="com.ulan.az.usluga.push.FirebaseMessagingService">
+        <service android:name=".push.FirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <activity android:name="com.ulan.az.usluga.forum.ForumInfoActivity" />
+        <activity android:name=".forum.ForumInfoActivity" />
         <activity
-            android:name="com.ulan.az.usluga.forum.ForumSubCategoryActivity"
+            android:name=".forum.ForumSubCategoryActivity"
             android:theme="@style/NoActionBar" />
         <activity
-            android:name="com.ulan.az.usluga.forum.ForumActivity"
+            android:name=".forum.ForumActivity"
             android:theme="@style/NoActionBar" />
-        <activity android:name="com.ulan.az.usluga.Profile.MyOrderActivity" />
-        <activity android:name="com.ulan.az.usluga.Profile.MyForumActivity" />
-        <activity android:name="com.ulan.az.usluga.forum.AddForumActivity" />
-        <activity android:name="com.ulan.az.usluga.MapActivity" />
-        <activity android:name="com.ulan.az.usluga.order.OrderMapActivity" />
-        <activity android:name="com.ulan.az.usluga.service.ServiceMapActivity" />
-        <activity android:name="com.ulan.az.usluga.Profile.ProfileActivity"></activity>
+        <activity android:name=".Profile.MyOrderActivity" />
+        <activity android:name=".Profile.MyForumActivity" />
+        <activity android:name=".forum.AddForumActivity" />
+        <activity android:name=".MapActivity" />
+        <activity android:name=".order.OrderMapActivity" />
+        <activity android:name=".service.ServiceMapActivity" />
+        <activity android:name=".Profile.ProfileActivity" />
+        <activity android:name=".Profile.MyServiceActivity"></activity>
+        <activity android:name=".Profile.RedactorForumActivity"></activity>
+        <activity android:name=".Profile.RedactorOrderActivity"></activity>
+        <activity android:name=".Profile.RedactorServiceActivity"></activity>
     </application>
 
 </manifest>

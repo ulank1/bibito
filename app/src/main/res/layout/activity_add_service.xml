@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dp"
     tools:context=".LoginActivity">
 
     <ScrollView
@@ -21,8 +22,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:layout_marginLeft="40dp"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:background="@drawable/spinner_bacpk">
 
             </Spinner>
 
@@ -31,8 +32,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:layout_marginLeft="40dp"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:background="@drawable/spinner_bacpk">
 
             </Spinner>
 
@@ -43,14 +44,14 @@
                 android:text="Адрес" />
 
             <EditText
-                android:textColorHint="#000"
-                android:textColor="#000"
                 android:id="@+id/address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:editable="false"
                 android:focusableInTouchMode="false"
-                android:hint="Выберите адрес" />
+                android:hint="Выберите адрес"
+                android:textColor="#000"
+                android:textColorHint="#000" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -59,28 +60,46 @@
                 android:text="Описание задачи" />
 
             <EditText
-                android:maxLength="100"
-                android:textColorHint="#000"
-                android:textColor="#000"
                 android:id="@+id/desc"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:maxLength="100"
+                android:textColor="#000"
+                android:textColorHint="#000" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Введите трудовой стаж" />
+
             <EditText
-                android:textColorHint="#000"
-                android:textColor="#000"
                 android:id="@+id/experience"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number" />
+                android:inputType="number"
+                android:textColor="#000"
+                android:textColorHint="#000" />
 
 
+            <View
 
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:id="@+id/btn_add"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/button_back"
+                android:onClick="onClick"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:text="добавить"
+                android:textColor="#fff" />
         </LinearLayout>
     </ScrollView>
 
@@ -91,19 +110,5 @@
         android:layout_centerInParent="true"
         android:visibility="gone" />
 
-
-    <Button
-        android:layout_alignParentBottom="true"
-        android:id="@+id/btn_add"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/button_back"
-        android:onClick="onClick"
-        android:paddingLeft="25dp"
-        android:paddingRight="25dp"
-        android:text="добавить"
-        android:textColor="#fff" />
 
 </RelativeLayout>

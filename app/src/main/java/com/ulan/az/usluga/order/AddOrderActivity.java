@@ -49,6 +49,7 @@ public class AddOrderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_add);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Задачи");
         address = findViewById(R.id.address);
         desc = findViewById(R.id.desc);
         progressBar = findViewById(R.id.progressbar);
@@ -233,8 +234,8 @@ public class AddOrderActivity extends AppCompatActivity {
                     .addFormDataPart("lat", String.valueOf(lat))
                     .addFormDataPart("lng", String.valueOf(lon))
                     .addFormDataPart("status", "1")
-                    .addFormDataPart("description", desc.getText().toString().isEmpty()?"-":desc.getText().toString())
-                    .addFormDataPart("image",path.split("/")[path.split("/").length-1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+                    .addFormDataPart("description", desc.getText().toString().isEmpty()?"-":desc.getText().toString()).build();
+                    //.addFormDataPart("image",path.split("/")[path.split("/").length-1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
 
             ClientApi.requestPostImage(URLS.order,req,clientApiListener);
         }

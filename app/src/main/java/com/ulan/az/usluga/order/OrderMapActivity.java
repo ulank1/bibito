@@ -7,6 +7,7 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -61,6 +62,7 @@ public class OrderMapActivity extends AppCompatActivity {
             public void onApiResponse(String id, String json, boolean isOk) {
                 if (isOk) {
                     try {
+                        Log.e("JSON",json);
                         JSONObject jsonObject = new JSONObject(json);
                         serviceArrayList = new ArrayList<>();
                         JSONArray jsonArray = jsonObject.getJSONArray("objects");
@@ -68,13 +70,13 @@ public class OrderMapActivity extends AppCompatActivity {
                             JSONObject object = jsonArray.getJSONObject(i);
                             final Service service = new Service();
                             service.setAddress(object.getString("address"));
-                            service.setExperience(object.getDouble("experience"));
                             if (!object.isNull("lat"))
                                 service.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
                             else service.setGeoPoint(new GeoPoint(0,0));                            service.setImage(object.getString("image"));
                             if (object.has("description"))
                                 service.setDescription(object.getString("description"));
                             service.setCategory(object.getJSONObject("sub_category").getString("sub_category"));
+                            Shared.category_id_order =object.getJSONObject("sub_category").getInt("id");
                             User user = new User();
                             JSONObject jsonUser = object.getJSONObject("user");
                             user.setAge(jsonUser.getString("age"));
@@ -99,8 +101,8 @@ public class OrderMapActivity extends AppCompatActivity {
             }
         };
         if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED,context))
-            ClientApi.requestGet(URLS.order+"&status=1&sub_category="+ Shared.category_id,listener);
-        else         ClientApi.requestGet(URLS.order+"&status=1",listener);
+            ClientApi.requestGet(URLS.order+"sub_category="+ Shared.category_id,listener);
+        else         ClientApi.requestGet(URLS.order,listener);
 
     }
 
