@@ -76,10 +76,11 @@
         <activity android:name=".order.OrderMapActivity" />
         <activity android:name=".service.ServiceMapActivity" />
         <activity android:name=".Profile.ProfileActivity" />
-        <activity android:name=".Profile.MyServiceActivity"></activity>
-        <activity android:name=".Profile.RedactorForumActivity"></activity>
-        <activity android:name=".Profile.RedactorOrderActivity"></activity>
-        <activity android:name=".Profile.RedactorServiceActivity"></activity>
+        <activity android:name=".Profile.MyServiceActivity" />
+        <activity android:name=".Profile.RedactorForumActivity" />
+        <activity android:name=".Profile.RedactorOrderActivity" />
+        <activity android:name=".Profile.RedactorServiceActivity" />
+        <activity android:name=".Profile.TenderActivity"></activity>
     </application>
 
 </manifest>

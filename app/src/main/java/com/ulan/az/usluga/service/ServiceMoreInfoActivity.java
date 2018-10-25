@@ -2,28 +2,31 @@ package com.ulan.az.usluga.service;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
@@ -31,23 +34,32 @@ import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.MapActivity;
 import com.ulan.az.usluga.MapViewO;
-import com.ulan.az.usluga.Profile.RVMyServiceAdapter;
 import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.helpers.DataHelper;
 import com.ulan.az.usluga.helpers.E;
 import com.ulan.az.usluga.helpers.Shared;
+import com.ulan.az.usluga.order.AddOrderActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class ServiceMoreInfoActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
@@ -57,7 +69,8 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
     RVAdditionalServiceAdapter adapter;
 
     DataHelper dataHelper;
-
+    Button button;
+    AlertDialog.Builder ad;
     ClientApiListener listener;
     ProgressBar progressBar;
     Context context;
@@ -74,6 +87,7 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         star = findViewById(R.id.star);
 
+        button = findViewById(R.id.btn_add);
 
         name = findViewById(R.id.name);
         avatar = findViewById(R.id.avatar);
@@ -145,7 +159,7 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
 
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(context, 1);
 
-        FloatingActionButton btnAdd = findViewById(R.id.btn_add);
+       // FloatingActionButton btnAdd = findViewById(R.id.btn_add);
        /* btnAdd.setVisibility(View.VISIBLE);
 
         btnAdd.setClickable(true);
@@ -159,6 +173,108 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
         LinearLayoutManager llm = new LinearLayoutManager(context);
         mRecyclerView.setLayoutManager(llm);
         mRecyclerView.setHasFixedSize(true);
+
+
+        ad = new AlertDialog.Builder(this);
+        ad.setTitle("Чтобы предложить услугу, вы должны создать услугу");  // заголовок
+        ad.setMessage("Хотите добавить услугу");
+        ad.setPositiveButton("да", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int arg1) {
+                startActivity(new Intent(ServiceMoreInfoActivity.this, AddOrderActivity.class));
+            }
+        });
+        ad.setNegativeButton("нет", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int arg1) {
+            }
+        });
+        ad.setCancelable(false);
+
+        ClientApiListener listener = new ClientApiListener() {
+            @Override
+            public void onApiResponse(final String id, String json, boolean isOk) {
+                try {
+                    JSONObject jsonObject = new JSONObject(json);
+                    JSONArray jsonArray = jsonObject.getJSONArray("objects");
+                    if (jsonArray.length() > 0) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                button.setVisibility(View.GONE);
+                            }
+                        });
+                    }
+
+                } catch(JSONException e){
+                    e.printStackTrace();
+                }
+
+            }
+        };
+
+        ClientApi.requestGet(URLS.confirm_service+"&order="+service.getId()+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, ServiceMoreInfoActivity.this)),listener);
+
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClientApiListener listener = new ClientApiListener() {
+                    @Override
+                    public void onApiResponse(String id, String json, boolean isOk) {
+
+                        if (!json.isEmpty()&&isOk){
+                            try {
+                                Log.e("LAN",json);
+                                JSONObject jsonObject = new JSONObject(json);
+                                JSONArray jsonArray = jsonObject.getJSONArray("objects");
+                                if (jsonArray.length()>0){
+
+                                    ClientApiListener listener1 = new ClientApiListener() {
+                                        @Override
+                                        public void onApiResponse(String id, String json, boolean isOk) {
+                                            Log.e("DDD",json);
+                                            if (isOk && json.isEmpty()) {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        button.setVisibility(View.GONE);
+                                                        Toast.makeText(ServiceMoreInfoActivity.this, "Отправлено", Toast.LENGTH_SHORT).show();
+                                                        send();
+
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    };
+                                    MultipartBody req = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                                            .addFormDataPart("user", "/api/v1/users/" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, ServiceMoreInfoActivity.this)) + "/")
+                                            .addFormDataPart("order", "/api/v1/service/" + String.valueOf(service.getId()) + "/").build();
+
+                                    ClientApi.requestPostImage(URLS.confirm_service, req, listener1);
+
+                                }else {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            ad.show();
+                                        }
+                                    });
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }
+                };
+                Log.e("DDDDDD","&sub_category__sub_category="+service.getCategory().split(" -> ")[1].trim()+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, ServiceMoreInfoActivity.this)));
+                ClientApi.requestGet(URLS.order+"&sub_category__sub_category="+service.getCategory().split(" -> ")[1].trim()+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, ServiceMoreInfoActivity.this)),listener);
+            }
+        });
+
+
+
 
         listener = new ClientApiListener() {
             @Override
@@ -226,6 +342,38 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
 
     }
 
+    public static final MediaType JSON
+            = MediaType.parse("application/json; charset=utf-8");
+
+    public void send() {
+
+        OkHttpClient client = new OkHttpClient();
+
+
+        RequestBody body = RequestBody.create(JSON, getJson());
+        Request request = new Request.Builder()
+                .header("Authorization", Shared.key)
+                .url("https://fcm.googleapis.com/fcm/send")
+                .post(body)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                //Log.e("Error", e.getMessage());
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String json = response.body().string();
+                //Log.e("RESPONSE_Finish", json);
+
+
+            }
+        });
+    }
+
+
     public void onClickPhone(View view) {
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "+" + service.getUser().getPhone()));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
@@ -255,7 +403,26 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
     }
 
 
+    public String getJson() {
+        JSONObject jsonObject = new JSONObject();
+        JSONObject notification = new JSONObject();
+        JSONObject data = new JSONObject();
+        try {
+            notification.put("title", "Задачи");
+            notification.put("body", "предлагают свою услугу");
+            notification.put("id", 1);
+            data.put("title", "Задачи");
+            data.put("body", "предлагают свою услугу");
+            data.put("id", 1);
+            jsonObject.put("notification", notification);
+            jsonObject.put("data", data);
+            jsonObject.put("to", service.getUser().getDeviceId());
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
+    }
 
 
 }

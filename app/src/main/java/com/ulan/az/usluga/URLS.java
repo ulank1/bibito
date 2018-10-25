@@ -25,6 +25,8 @@ public class URLS {
     public static String confirmation_delete = root+"api/v1/confirmation/";
     public static String confirm = root+"api/v1/confirm/?format=json";
     public static String confirm_delete = root+"api/v1/confirm/";
+    public static String confirm_service = root+"api/v1/confirm_service/?format=json";
+    public static String confirm_delete_service = root+"api/v1/confirm_service/";
     public static String comment = root+"api/v1/comment/?format=json";
 
 }

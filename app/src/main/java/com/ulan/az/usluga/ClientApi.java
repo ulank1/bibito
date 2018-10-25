@@ -2,6 +2,7 @@ package com.ulan.az.usluga;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.ulan.az.usluga.helpers.E;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -82,6 +84,38 @@ public class ClientApi {
     }
 
 
+    public static void requesPutStatus(final String url, int status) {
+
+        OkHttpClient client = new OkHttpClient();
+
+        MultipartBody req = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("status", String.valueOf(status)).build();
+
+
+        final Request request = new Request.Builder()
+                .url(url)
+                .put(req)
+                .build();
+
+
+        //Log.e("sssss", "ssss");
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e("Error", e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String json = response.body().string();
+                Log.e("RESPONSE_Finish", json);
+
+            }
+        });
+    }
+
+
     private static void sendResponse(String id, String json, ClientApiListener listener) {
 
         listener.onApiResponse(id, json, true);
@@ -148,11 +182,11 @@ public class ClientApi {
         OkHttpClient client = new OkHttpClient();
 
         RequestBody requestBody = new FormBody.Builder()
-                .add("count", count+"")
+                .add("count", count + "")
                 .build();
 
         final Request request = new Request.Builder()
-                .url(URLS.forum_put +id + "/")
+                .url(URLS.forum_put + id + "/")
                 .put(requestBody)
                 .build();
         client.newCall(request).enqueue(new Callback() {
@@ -213,7 +247,7 @@ public class ClientApi {
         });
     }
 
-    public static void requestDelete1(String url,int id, Context context) {
+    public static void requestDelete1(String url, int id, Context context) {
 
         OkHttpClient client = new OkHttpClient();
 

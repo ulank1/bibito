@@ -6,6 +6,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.ulan.az.usluga.ClientApi;
@@ -86,6 +87,8 @@ public class MyOrderActivity extends AppCompatActivity {
                         @Override
                         public void onApiResponse(String id, String json, boolean isOk) {
 
+                            Log.e("UUU",json);
+
                             ArrayList<User> users1 = new ArrayList<>();
 
                             JSONObject jsonObject = null;
@@ -98,8 +101,9 @@ public class MyOrderActivity extends AppCompatActivity {
                                     JSONObject object = jsonArray.getJSONObject(i);
 
                                     User user = new User();
-                                    user.setId(object.getInt("id"));
                                     JSONObject jsonUser = object.getJSONObject("user");
+                                    user.setId(jsonUser.getInt("id"));
+                                    user.setId_confirm(object.getInt("id"));
                                     user.setAge(jsonUser.getString("age"));
                                     user.setImage(jsonUser.getString("image"));
                                     user.setName(jsonUser.getString("name"));
@@ -134,7 +138,7 @@ public class MyOrderActivity extends AppCompatActivity {
 
                     users = new ArrayList<>();
                     if (orders.size()>0)
-                    ClientApi.requestGet(URLS.confirm + "&order=" + orders.get(a).getId(), listener1);
+                    ClientApi.requestGet(URLS.confirm + "&order=" + orders.get(a).getId()+"&status=1", listener1);
 
                 }
             }

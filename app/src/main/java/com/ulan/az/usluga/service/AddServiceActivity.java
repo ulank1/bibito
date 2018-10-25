@@ -126,7 +126,7 @@ public class AddServiceActivity extends AppCompatActivity {
                         }
                     };
 
-                    ClientApi.requestGet(URLS.sub_category + "&category=" + categoryArrayList.get(position - 1).getId(), listener);
+                    ClientApi.requestGet(URLS.sub_category_service + "&category=" + categoryArrayList.get(position - 1).getId(), listener);
                 }
             }
 
@@ -190,7 +190,7 @@ public class AddServiceActivity extends AppCompatActivity {
             }
         };
 
-        ClientApi.requestGet(URLS.category,listener);
+        ClientApi.requestGet(URLS.category_service,listener);
 
 
 
@@ -240,7 +240,7 @@ public class AddServiceActivity extends AppCompatActivity {
 
             final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/jpg");
             MultipartBody req = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                    .addFormDataPart("sub_category","/api/v1/subcategory/"+ String.valueOf(subCategoryArrayList.get(subCategory.getSelectedItemPosition()-1).getId())+"/")
+                    .addFormDataPart("sub_category","/api/v1/subcategory_service/"+ String.valueOf(subCategoryArrayList.get(subCategory.getSelectedItemPosition()-1).getId())+"/")
                     .addFormDataPart("user","/api/v1/users/"+String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID,AddServiceActivity.this))+"/")
                     .addFormDataPart("address",address.getText().toString())
                     .addFormDataPart("lat", String.valueOf(lat))

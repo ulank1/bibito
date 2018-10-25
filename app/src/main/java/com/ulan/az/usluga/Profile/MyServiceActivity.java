@@ -11,6 +11,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -46,6 +47,10 @@ public class MyServiceActivity extends AppCompatActivity {
     ClientApiListener listener;
     ProgressBar progressBar;
     Context context;
+    ArrayList<ArrayList<User>> users;
+    ArrayList<Service> orders;
+    int a = 0;
+    ClientApiListener listener1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,22 +80,18 @@ public class MyServiceActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(llm);
         mRecyclerView.setHasFixedSize(true);
 
-        listener = new ClientApiListener() {
+        ClientApiListener listener = new ClientApiListener() {
             @Override
             public void onApiResponse(String id, String json, boolean isOk) {
-
                 if (isOk) {
                     try {
                         JSONObject jsonObject = new JSONObject(json);
-                        serviceArrayList = new ArrayList<>();
+                        orders = new ArrayList<>();
                         JSONArray jsonArray = jsonObject.getJSONArray("objects");
                         for (int i = 0; i < jsonArray.length(); i++) {
-                            boolean bool = true;
                             JSONObject object = jsonArray.getJSONObject(i);
                             Service service = new Service();
                             service.setAddress(object.getString("address"));
-                            if (!object.isNull("experience"))
-                                service.setExperience(object.getDouble("experience"));
                             if (!object.isNull("lat"))
                                 service.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
                             else service.setGeoPoint(new GeoPoint(0, 0));
@@ -106,30 +107,76 @@ public class MyServiceActivity extends AppCompatActivity {
                             user.setName(jsonUser.getString("name"));
                             user.setPhone(jsonUser.getString("phone"));
                             service.setUser(user);
-
-                            serviceArrayList.add(service);
+                            orders.add(service);
 
                         }
-                        Shared.serviceCategories = serviceArrayList;
-                        adapter = new RVMyServiceAdapter(context, serviceArrayList);
-
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                // things to do on the main thread
-                                progressBar.setVisibility(View.GONE);
-                                mRecyclerView.setAdapter(adapter);
-                            }
-                        });
 
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
+                    listener1 = new ClientApiListener() {
+                        @Override
+                        public void onApiResponse(String id, String json, boolean isOk) {
+
+                            Log.e("UUU",json);
+
+                            ArrayList<User> users1 = new ArrayList<>();
+
+                            JSONObject jsonObject = null;
+                            try {
+                                jsonObject = new JSONObject(json);
+
+
+                                JSONArray jsonArray = jsonObject.getJSONArray("objects");
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject object = jsonArray.getJSONObject(i);
+
+                                    User user = new User();
+                                    JSONObject jsonUser = object.getJSONObject("user");
+                                    user.setId(jsonUser.getInt("id"));
+                                    user.setId_confirm(object.getInt("id"));
+                                    user.setAge(jsonUser.getString("age"));
+                                    user.setImage(jsonUser.getString("image"));
+                                    user.setName(jsonUser.getString("name"));
+                                    user.setPhone(jsonUser.getString("phone"));
+                                    user.setDeviceId(jsonUser.getString("device_id"));
+                                    users1.add(user);
+
+                                }
+                                users.add(users1);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            a++;
+                            if (a == orders.size()) {
+                                adapter = new RVMyServiceAdapter(context,orders,users);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mRecyclerView.setAdapter(adapter);
+
+                                    }
+                                });
+                            } else {
+                                ClientApi.requestGet(URLS.confirm_service + "&order=" + orders.get(a).getId(), listener1);
+                            }
+
+                        }
+                    };
+
+
+                    users = new ArrayList<>();
+                    if (orders.size()>0)
+                        ClientApi.requestGet(URLS.confirm_service + "&order=" + orders.get(a).getId()+"&status=1", listener1);
+
                 }
             }
         };
-        progressBar.setVisibility(View.VISIBLE);
-        ClientApi.requestGet(URLS.services + "&user=" + E.getAppPreferencesINT(E.APP_PREFERENCES_ID,context), listener);
+
+        ClientApi.requestGet(URLS.services + "&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context)), listener);
 
     }
 

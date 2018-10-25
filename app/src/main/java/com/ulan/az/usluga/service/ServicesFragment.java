@@ -119,6 +119,8 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
                             user.setName(jsonUser.getString("name"));
                             user.setPhone(jsonUser.getString("phone"));
                             user.setId(jsonUser.getInt("id"));
+                            user.setDeviceId(jsonUser.getString("device_id"));
+
                             service.setUser(user);
 
                             serviceArrayList.add(service);

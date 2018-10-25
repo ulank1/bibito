@@ -172,8 +172,8 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                         }
                     }
                 };
-                Log.e("DDDDDD","&sub_category="+Shared.category_id+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, OrderMoreInfoActivity.this)));
-                ClientApi.requestGet(URLS.services+"&sub_category="+Shared.category_id_order+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, OrderMoreInfoActivity.this)),listener);
+                Log.e("DDDDDD","&sub_category__sub_category="+service.getCategory()+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, OrderMoreInfoActivity.this)));
+                ClientApi.requestGet(URLS.services+"&sub_category__sub_category="+service.getCategory()+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, OrderMoreInfoActivity.this)),listener);
             }
         });
 

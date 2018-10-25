@@ -10,6 +10,7 @@ public class User implements Serializable  {
 
     String name,age,phone,image, deviceId;
     int id;
+    int id_confirm;
 
     public String getName() {
         return name;
@@ -57,5 +58,13 @@ public class User implements Serializable  {
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
+    }
+
+    public int getId_confirm() {
+        return id_confirm;
+    }
+
+    public void setId_confirm(int id_confirm) {
+        this.id_confirm = id_confirm;
     }
 }

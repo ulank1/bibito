@@ -87,6 +87,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"></com.ulan.az.usluga.MapViewO>
 
+            <Button
+                android:layout_marginTop="20dp"
+                android:visibility="visible"
+                android:textColor="#fff"
+                android:layout_gravity="center"
+                android:paddingRight="20dp"
+                android:paddingLeft="20dp"
+                android:text="Предложить задачу"
+                android:id="@+id/btn_add"
+                android:background="@drawable/btn_back_violet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv"

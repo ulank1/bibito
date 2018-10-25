@@ -17,6 +17,8 @@ public class E {
     public static final String APP_PREFERENCES = "mysettings";
     public static final String APP_PREFERENCES_FILTER_CATEGORY = "filter_category";
     public static final String APP_PREFERENCES_FILTER_SUBCATEGORY = "filter_subcategory";
+    public static final String APP_PREFERENCES_FILTER_CATEGORY_SERVICE = "filter_category_service";
+    public static final String APP_PREFERENCES_FILTER_SUBCATEGORY_SERVICE = "filter_subcategory_service";
     public static final String APP_PREFERENCES_FILTER_IS_CHECKED = "filter_is_checked";
     public static final String APP_PREFERENCES_NAME = "name";
     public static final String APP_PREFERENCES_ID = "id";

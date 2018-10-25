@@ -2,6 +2,7 @@ package com.ulan.az.usluga.Profile;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,12 +11,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.R;
+import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.helpers.DataHelper;
 import com.ulan.az.usluga.service.Service;
-import com.ulan.az.usluga.service.ServiceMoreInfoActivity;
 
 import java.util.ArrayList;
 
@@ -27,48 +27,52 @@ public class RVMyServiceAdapter extends RecyclerView.Adapter<RVMyServiceAdapter.
 
     public class PersonViewHolder extends RecyclerView.ViewHolder {
 
-       TextView name,phone,experience;
+       TextView category;
        ImageView imageView,redactor;
        DataHelper dataHelper;
-
+       RecyclerView mRecyclerView;
 
 
         PersonViewHolder(final View itemView) {
             super(itemView);
 
-            name = (TextView) itemView.findViewById(R.id.name);
-            phone = (TextView) itemView.findViewById(R.id.phone);
-            experience = (TextView) itemView.findViewById(R.id.experience);
+
             imageView = (ImageView) itemView.findViewById(R.id.delete);
-            redactor = (ImageView) itemView.findViewById(R.id.redactor);
+            category = (TextView) itemView.findViewById(R.id.category);
+
             dataHelper = new DataHelper(context);
+
+            redactor = (ImageView) itemView.findViewById(R.id.redactor);
 
             redactor.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context,RedactorServiceActivity.class);
+                    Intent intent = new Intent(context,RedactorOrderActivity.class);
                     intent.putExtra("service",listVse.get(getAdapterPosition()));
                     context.startActivity(intent);
                 }
             });
 
+
+            category.setVisibility(View.VISIBLE);
             imageView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    ClientApi.requestDeleteService(listVse.get(getAdapterPosition()).getId(),context);
-                    listVse.remove(getAdapterPosition());
-                    notifyDataSetChanged();
+                    delete(getAdapterPosition(),listVse.get(getAdapterPosition()).getId(),context,RVMyServiceAdapter.this);
                 }
             });
+            mRecyclerView = (RecyclerView) itemView.findViewById(R.id.rv);
 
+            LinearLayoutManager llm = new LinearLayoutManager(context);
+            mRecyclerView.setLayoutManager(llm);
+            mRecyclerView.setHasFixedSize(true);
 
             itemView.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
 
-                context.startActivity(new Intent(context,ServiceMoreInfoActivity.class).putExtra("service",listVse.get(getAdapterPosition())));
+             //   context.startActivity(new Intent(context,ServiceMoreInfoActivity.class).putExtra("service",listVse.get(getAdapterPosition())));
 
                 }
 
@@ -81,11 +85,13 @@ public class RVMyServiceAdapter extends RecyclerView.Adapter<RVMyServiceAdapter.
 
     }
 
-    ArrayList<Service> listVse;
+    public static ArrayList<Service> listVse;
+    ArrayList<ArrayList<User>> users;
 
-    public RVMyServiceAdapter(Context context, ArrayList<Service> listVse) {
+    public RVMyServiceAdapter(Context context, ArrayList<Service> listVse, ArrayList<ArrayList<User>> users) {
         this.listVse = listVse;
         this.context = context;
+        this.users = users;
     }
 
     @Override
@@ -97,7 +103,7 @@ public class RVMyServiceAdapter extends RecyclerView.Adapter<RVMyServiceAdapter.
     public PersonViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v = null;
         try {
-            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_my_service, viewGroup, false);
+            v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_my_order, viewGroup, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,10 +114,16 @@ public class RVMyServiceAdapter extends RecyclerView.Adapter<RVMyServiceAdapter.
     @Override
     public void onBindViewHolder(PersonViewHolder personViewHolder, int i) {
         vse = listVse.get(i);
-        personViewHolder.name.setText(vse.getDescription());
-        personViewHolder.experience.setText(vse.getExperience()+"");
-        personViewHolder.phone.setText(vse.getUser().getPhone());
+        personViewHolder.category.setText(vse.getCategory());
+        RVMyServiceSecondAdapter adapter = new RVMyServiceSecondAdapter(context,users.get(i),vse.getId(),i,this);
+        personViewHolder.mRecyclerView.setAdapter(adapter);
 
+
+       /* if (vse.is_favorite){
+            Glide.with(context).load(R.drawable.ic_action_star_active).into(personViewHolder.imageView);
+        }else {
+            Glide.with(context).load(R.drawable.ic_action_star_none_active).into(personViewHolder.imageView);
+        }*/
 
     }
 
@@ -120,4 +132,13 @@ public class RVMyServiceAdapter extends RecyclerView.Adapter<RVMyServiceAdapter.
     public int getItemCount() {
         return listVse.size();
     }
+
+    public static void delete(int position, int id, Context context, RVMyServiceAdapter rvMyOrderAdapter){
+        ClientApi.requestDelete(id,context);
+        DataHelper dataHelper = new DataHelper(context);
+        dataHelper.delete(id);
+        listVse.remove(position);
+        rvMyOrderAdapter.notifyDataSetChanged();
+    }
+
 }

@@ -544,7 +544,8 @@ public class Main2Activity extends AppCompatActivity
         subCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                E.setAppPreferences(E.APP_PREFERENCES_FILTER_SUBCATEGORY,context,position);
+                if (viewPager.getCurrentItem()==1) E.setAppPreferences(E.APP_PREFERENCES_FILTER_SUBCATEGORY,context,position);
+                else  if (viewPager.getCurrentItem()==0) E.setAppPreferences(E.APP_PREFERENCES_FILTER_SUBCATEGORY_SERVICE,context,position);
                 if (position>0) {
                     for (Category category:subCategoryArrayList) {
                         Log.e("Category",category.getCategory()+" "+category.getId());
@@ -571,13 +572,16 @@ public class Main2Activity extends AppCompatActivity
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position > 0) {
-                    E.setAppPreferences(E.APP_PREFERENCES_FILTER_CATEGORY,context,position);
-
+                    if (viewPager.getCurrentItem()==1)
+                        E.setAppPreferences(E.APP_PREFERENCES_FILTER_CATEGORY,context,position);
+                    else if (viewPager.getCurrentItem()==0) {
+                        E.setAppPreferences(E.APP_PREFERENCES_FILTER_CATEGORY_SERVICE, context, position);
+                    }
                     ClientApiListener listener = new ClientApiListener() {
                         @SuppressLint("ResourceType")
                         @Override
                         public void onApiResponse(String id, String json, boolean isOk) {
-                            //Log.e("SSSS", "SSSS");
+                            Log.e("SSSS", json);
                             if (isOk) {
                                 try {
                                     JSONObject jsonObject = new JSONObject(json);
@@ -611,7 +615,10 @@ public class Main2Activity extends AppCompatActivity
 
                                             subCategory.setAdapter(adapter);
                                             if (count==0){
-                                                subCategory.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_SUBCATEGORY,context));
+                                                if (viewPager.getCurrentItem()==1)subCategory.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_SUBCATEGORY,context));
+
+                                                else  if (viewPager.getCurrentItem()==0)
+                                                    subCategory.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_SUBCATEGORY_SERVICE,context));
                                                 count=1;
                                             }
                                         }
@@ -626,7 +633,7 @@ public class Main2Activity extends AppCompatActivity
                     };
                     if (viewPager.getCurrentItem()==1)
                     ClientApi.requestGet(URLS.sub_category + "&category=" + categoryArrayList.get(position - 1).getId(), listener);
-                    else if (viewPager.getCurrentItem()==1){
+                    else if (viewPager.getCurrentItem()==0){
                         ClientApi.requestGet(URLS.sub_category_service + "&category=" + categoryArrayList.get(position - 1).getId(), listener);
 
                     }
@@ -676,8 +683,10 @@ public class Main2Activity extends AppCompatActivity
                             @Override
                             public void run() {
                                 category.setAdapter(adapter);
-
-                                category.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_CATEGORY,context));
+                                if (viewPager.getCurrentItem() == 1)
+                                    category.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_CATEGORY,context));
+                                else if (viewPager.getCurrentItem() == 0)
+                                    category.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_CATEGORY_SERVICE,context));
                             }
                         });
                     } catch (JSONException e) {
@@ -703,7 +712,7 @@ public class Main2Activity extends AppCompatActivity
             @SuppressLint("ResourceType")
             @Override
             public void onApiResponse(String id, String json, boolean isOk) {
-                Log.e("SSSS",json);
+                Log.e("SvvvSSS",json);
                 if (isOk) {
                     try {
                         JSONObject jsonObject = new JSONObject(json);
@@ -734,8 +743,12 @@ public class Main2Activity extends AppCompatActivity
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+
                                 category.setAdapter(adapter);
-                                category.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_CATEGORY,context));
+                                if (viewPager.getCurrentItem() == 1)
+                                    category.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_CATEGORY,context));
+                                else if (viewPager.getCurrentItem() == 0)
+                                    category.setSelection(E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_CATEGORY_SERVICE,context));
                             }
                         });
                     } catch (JSONException e) {

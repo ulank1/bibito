@@ -1,22 +1,34 @@
 package com.ulan.az.usluga.Profile;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ulan.az.usluga.ClientApi;
+import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.helpers.Shared;
+import com.ulan.az.usluga.order.OrderMoreInfoActivity;
+import com.ulan.az.usluga.service.RVServiceAdapter;
+import com.ulan.az.usluga.service.Service;
+import com.ulan.az.usluga.service.ServiceMoreInfoActivity;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.util.GeoPoint;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +51,7 @@ public class RVMyOrderSecondAdapter extends RecyclerView.Adapter<RVMyOrderSecond
 
        TextView name,phone;
        ImageView check,cancel;
+       ProgressBar progressBar;
 
 
         PersonViewHolder(final View itemView) {
@@ -48,13 +61,57 @@ public class RVMyOrderSecondAdapter extends RecyclerView.Adapter<RVMyOrderSecond
             phone = (TextView) itemView.findViewById(R.id.phone);
             check = (ImageView) itemView.findViewById(R.id.check);
             cancel = (ImageView) itemView.findViewById(R.id.cancel);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progressbar);
 
             itemView.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
+                   ClientApiListener listener = new ClientApiListener() {
+                        @Override
+                        public void onApiResponse(String id, String json, boolean isOk) {
+                            Log.e("OOO",json);
+                            if (isOk) {
+                                try {
+                                    JSONObject jsonObject = new JSONObject(json);
+                                    JSONArray jsonArray = jsonObject.getJSONArray("objects");
+                                        boolean bool = true;
+                                        JSONObject object = jsonArray.getJSONObject(0);
+                                        Service service = new Service();
+                                        service.setAddress(object.getString("address"));
+                                        if (!object.isNull("experience"))
+                                            service.setExperience(object.getDouble("experience"));
+                                        if (!object.isNull("lat"))
+                                            service.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
+                                        else service.setGeoPoint(new GeoPoint(0, 0));
+                                        service.setImage(object.getString("image"));
+                                        if (object.has("description"))
+                                            service.setDescription(object.getString("description"));
+                                        service.setCategory(object.getJSONObject("sub_category").getJSONObject("category").getString("category")+" -> "+object.getJSONObject("sub_category").getString("sub_category"));
+                                        service.setId(object.getInt("id"));
+                                        User user = new User();
+                                        JSONObject jsonUser = object.getJSONObject("user");
+                                        user.setAge(jsonUser.getString("age"));
+                                        user.setImage(jsonUser.getString("image"));
+                                        user.setName(jsonUser.getString("name"));
+                                        user.setPhone(jsonUser.getString("phone"));
+                                        user.setId(jsonUser.getInt("id"));
+                                        user.setDeviceId(jsonUser.getString("device_id"));
 
-                //context.startActivity(new Intent(context,OrderMoreInfoActivity.class).putExtra("service",listVse.get(getAdapterPosition())));
+                                        service.setUser(user);
+                                    context.startActivity(new Intent(context,ServiceMoreInfoActivity.class).putExtra("service",service));
+
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    };
+                    Log.e("OOOii",listVse.get(getAdapterPosition()).getId()+"");
+                    ClientApi.requestGet(URLS.services+"&user="+listVse.get(getAdapterPosition()).getId(),listener);
+
+
 
                 }
 
@@ -64,16 +121,18 @@ public class RVMyOrderSecondAdapter extends RecyclerView.Adapter<RVMyOrderSecond
             check.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    RVMyOrderAdapter.delete(position,id,context,rvMyOrderAdapter);
-                    ClientApi.requestDelete(listVse.get(getAdapterPosition()).getId(),context);
+                 //   RVMyOrderAdapter.delete(position,id,context,rvMyOrderAdapter);
+                    ClientApi.requesPutStatus(URLS.confirm_delete+listVse.get(getAdapterPosition()).getId_confirm()+"/",0);
                     send(getAdapterPosition());
+                    listVse.remove(getAdapterPosition());
+                    notifyDataSetChanged();
                 }
             });
 
             cancel.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ClientApi.requestDelete1(URLS.confirm_delete,listVse.get(getAdapterPosition()).getId(),context);
+                    ClientApi.requesPutStatus(URLS.confirm_delete+listVse.get(getAdapterPosition()).getId_confirm()+"/",2);
                     listVse.remove(getAdapterPosition());
                     notifyDataSetChanged();
                 }
