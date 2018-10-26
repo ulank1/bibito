@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +19,10 @@ import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.FilterListener;
 import com.ulan.az.usluga.Main2Activity;
 import com.ulan.az.usluga.R;
+import com.ulan.az.usluga.Searchlistener;
 import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.helpers.Shared;
+import com.ulan.az.usluga.service.Service;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,7 +33,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ForumCategoryFragment extends Fragment implements FilterListener {
+public class ForumCategoryFragment extends Fragment implements FilterListener, Searchlistener {
 
     int tag;
     RecyclerView mRecyclerView;
@@ -112,5 +115,21 @@ public class ForumCategoryFragment extends Fragment implements FilterListener {
             adapter = new RVForumCategoryAdapter(getActivity(), categories, 1);
 
             mRecyclerView.setAdapter(adapter);*/
+    }
+
+    @Override
+    public void onSearch(ArrayList<Service> services) {
+        Log.e("DDSS",Shared.forumCategories_search.size()+"");
+        if (Shared.forumCategories_search.size()>-1) {
+            adapter = new RVForumCategoryAdapter(getActivity(), Shared.forumCategories_search, 1);
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    // things to do on the main thread
+
+                    mRecyclerView.setAdapter(adapter);
+                }
+            });
+        }
     }
 }

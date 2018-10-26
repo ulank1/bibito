@@ -17,6 +17,7 @@ public class Service implements Serializable {
     User user;
     int id;
     boolean is_favorite;
+    int status;
 
     public String getImage() {
         return image;
@@ -88,5 +89,13 @@ public class Service implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

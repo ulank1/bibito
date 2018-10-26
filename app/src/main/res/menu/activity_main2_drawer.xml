@@ -20,6 +20,11 @@
             android:id="@+id/nav_services"
             android:icon="@drawable/ic_action_desc"
             android:title="Мои Услуги" />
+
+        <item
+            android:id="@+id/nav_tender"
+            android:icon="@drawable/ic_action_desc"
+            android:title="Мои предложения" />
     </group>
 
 </menu>

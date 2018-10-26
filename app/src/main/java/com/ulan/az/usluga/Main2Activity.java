@@ -47,6 +47,7 @@ import com.ulan.az.usluga.Profile.MyForumActivity;
 import com.ulan.az.usluga.Profile.MyOrderActivity;
 import com.ulan.az.usluga.Profile.MyServiceActivity;
 import com.ulan.az.usluga.Profile.ProfileActivity;
+import com.ulan.az.usluga.Profile.TenderActivity;
 import com.ulan.az.usluga.forum.ForumCategoryFragment;
 import com.ulan.az.usluga.helpers.E;
 import com.ulan.az.usluga.helpers.Shared;
@@ -70,7 +71,7 @@ public class Main2Activity extends AppCompatActivity
     ViewPager viewPager;
     private TabLayout tabLayout;
     FragmentManager fm;
-    FilterListener orderApiListener, serviceApiListener, forumListener;
+    FilterListener orderApiListener, serviceApiListener;
     MaterialSearchView searchView;
     Spinner category, subCategory;
     ArrayList<String> serviceArrayList;
@@ -82,7 +83,7 @@ public class Main2Activity extends AppCompatActivity
     Context context;
     EditText editSearch;
     int count = 0;
-    Searchlistener searchlistenerService,searchlistenerOrder;
+    Searchlistener searchlistenerService,searchlistenerOrder, forumListener;
     LinearLayout lineSearch;
     RelativeLayout relativeRefresh;
 
@@ -178,6 +179,18 @@ public class Main2Activity extends AppCompatActivity
                             }
                         }
                         searchlistenerOrder.onSearch(categories);
+                    }else {
+                        ArrayList<Category> categories = new ArrayList<>();
+
+                        for (Category category : Shared.forumCategories) {
+                            String s = category.getCategory().toLowerCase();
+                            Log.e("kkkk",s+" - "+query);
+                            if (s.contains(query.toLowerCase())) {
+                                categories.add(category);
+                            }
+                        }
+                        Shared.forumCategories_search = categories;
+                        forumListener.onSearch(null);
                     }
 
                     InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -283,6 +296,17 @@ public class Main2Activity extends AppCompatActivity
                         }
                     }
                     searchlistenerOrder.onSearch(categories);
+                }else{
+                    ArrayList<Category> categories = new ArrayList<>();
+
+                    for (Category category : Shared.forumCategories) {
+                        String s = category.getCategory().toLowerCase();
+                        if (s.contains(query.toLowerCase())) {
+                            categories.add(category);
+                        }
+                    }
+                    Shared.forumCategories_search = categories;
+                    searchlistenerOrder.onSearch(null);
                 }
 
 
@@ -413,6 +437,10 @@ public class Main2Activity extends AppCompatActivity
             startActivity(new Intent(Main2Activity.this, MyServiceActivity.class));
 
         }
+    else if (id == R.id.nav_tender) {
+        startActivity(new Intent(Main2Activity.this, TenderActivity.class));
+
+    }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -526,7 +554,7 @@ public class Main2Activity extends AppCompatActivity
         this.searchlistenerService = searchlistener;
     }
 
-    public void setForumApiListener(FilterListener serviceApiListener) {
+    public void setForumApiListener(Searchlistener serviceApiListener) {
         this.forumListener = serviceApiListener;
     }
 
@@ -784,7 +812,6 @@ public class Main2Activity extends AppCompatActivity
         } else {
             filter.setVisibility(View.GONE);
             imgMap.setVisibility(View.GONE);
-            imgSearch.setVisibility(View.GONE);
         }
     }
 
