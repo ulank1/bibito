@@ -64,7 +64,6 @@
                         android:layout_toRightOf="@+id/avatar"
                         android:text="dsfsdfsdfdsf"
                         android:textColor="#000"
-                        android:textSize="18sp"
                         android:textStyle="bold" />
                 </RelativeLayout>
 
