@@ -1,13 +1,18 @@
 package com.ulan.az.usluga.forum;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -28,11 +33,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.ClientApiListener;
+import com.ulan.az.usluga.PagerImageFragment;
 import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.helpers.E;
 import com.ulan.az.usluga.helpers.Shared;
+import com.ulan.az.usluga.order.OrderMoreInfoActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,7 +50,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import me.relex.circleindicator.CircleIndicator;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -64,10 +74,21 @@ public class ForumInfoActivity extends AppCompatActivity {
     RVCommentAdapter adapter;
     ArrayList<Comment> comments;
     ImageView avatar;
+
+    ImageView share,like;
+    TextView textLike;
+    Context context;
+
+    ViewPager pager;
+
+    int isLike = 0;
+    int likeCount;
+    Timer timer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum_info);
+        context = this;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         name = findViewById(R.id.name);
         date = findViewById(R.id.date);
@@ -83,6 +104,37 @@ public class ForumInfoActivity extends AppCompatActivity {
 
         forum = (Forum) getIntent().getSerializableExtra("forum");
 
+        init();
+        RelativeLayout relativeLayout = findViewById(R.id.relative);
+
+        pager = (ViewPager) findViewById(R.id.viewpager);
+        if (forum.getImages()!=null&&forum.getImages().size()>0) {
+            relativeLayout.setVisibility(View.VISIBLE);
+            MyFragmentPagerAdapter pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
+            pager.setAdapter(pagerAdapter);
+
+            CircleIndicator indicator = (CircleIndicator) findViewById(R.id.indicator);
+            indicator.setViewPager(pager);
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    final int pos;
+                    if (pager.getCurrentItem()+1==forum.getImages().size())
+                        pos = 0;
+                    else pos = pager.getCurrentItem()+1;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            pager.setCurrentItem(pos);
+                        }
+                    });
+                }
+            },10000,10000);
+        }else {
+            ImageView imageView = findViewById(R.id.placeholder);
+            imageView.setVisibility(View.VISIBLE);
+        }
         send.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -128,6 +180,10 @@ public class ForumInfoActivity extends AppCompatActivity {
             }
         });
 
+        if (forum.getUser().getId()==E.getAppPreferencesINT(E.APP_PREFERENCES_ID,this)){
+            add.setVisibility(View.GONE);
+        }
+
         mRecyclerView = (RecyclerView) findViewById(R.id.rv);
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
@@ -135,7 +191,7 @@ public class ForumInfoActivity extends AppCompatActivity {
 
         //Log.e("tag", getArguments().getInt("tag") + "");
 
-        LinearLayoutManager llm = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        LinearLayoutManager llm = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,true);
         mRecyclerView.setLayoutManager(llm);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setNestedScrollingEnabled(false);
@@ -212,6 +268,129 @@ public class ForumInfoActivity extends AppCompatActivity {
             });
         }
     }
+
+
+    private void init() {
+
+        share = findViewById(R.id.share);
+        like = findViewById(R.id.like);
+        textLike = findViewById(R.id.text_like);
+
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text ="Категория : " + forum.getTitle()+
+                        "\nTелефон : " +forum.getUser().getPhone()+
+                        "\nОписание : "+ forum.getDescription()+"";
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "");
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+            }
+        });
+
+
+
+
+        getLikes();
+
+
+
+
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isLike!=0){
+
+                    ClientApi.requestDelete1(URLS.like_forum_put,isLike,context);
+                    like.setImageResource(R.drawable.like_inactive);
+                    likeCount--;
+                    textLike.setText("Нравится "+likeCount);
+                    isLike=0;
+
+                }else {
+                    ClientApiListener listener1 = new ClientApiListener() {
+                        @Override
+                        public void onApiResponse(String id, String json, boolean isOk) {
+                            Log.e("dddsssdcx",json);
+                            if (json.isEmpty()){
+                                getLikes();
+                            }
+
+                        }
+                    };
+
+                    MultipartBody.Builder req = new MultipartBody.Builder().setType(MultipartBody.FORM);
+                    req.addFormDataPart("user_id_owner", E.getAppPreferencesINT(E.APP_PREFERENCES_ID,context)+"");
+                    req.addFormDataPart("type_id", forum.getId()+"");
+                    RequestBody requestBody = req.build();
+                    ClientApi.requestPostImage(URLS.like_forum_put,requestBody,listener1);
+
+                }
+            }
+        });
+
+
+    }
+
+
+    public void getLikes(){
+        ClientApiListener listener = new ClientApiListener() {
+            @Override
+            public void onApiResponse(String id, String json, boolean isOk) {
+                try {
+                    JSONObject jsonObject = new JSONObject(json);
+                    JSONArray jsonArray = jsonObject.getJSONArray("objects");
+                    likeCount = jsonArray.length();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            textLike.setText("Нравится "+likeCount);
+
+                        }
+                    });
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject object = jsonArray.getJSONObject(i);
+                        int id_own = E.getAppPreferencesINT(E.APP_PREFERENCES_ID,context);
+                        if (id_own == object.getInt("user_id_owner")){
+                            isLike = object.getInt("id");
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    like.setImageResource(R.drawable.like_active);
+
+                                }
+                            });
+                            break;
+                        }
+                        if (i==jsonArray.length()-1){
+                            isLike = 0;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    like.setImageResource(R.drawable.like_inactive);
+
+                                }
+                            });
+                        }
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Log.e("ID",forum.getId()+"");
+
+        ClientApi.requestGet(URLS.like_forum+"&type_id="+forum.getId(),listener);
+
+    }
+
 
     public String getJson() {
         JSONObject jsonObject = new JSONObject();
@@ -296,8 +475,10 @@ public class ForumInfoActivity extends AppCompatActivity {
                             user.setAge(jsonUser.getString("age"));
                             user.setImage(jsonUser.getString("image"));
                             user.setName(jsonUser.getString("name"));
+                            comment.setName(jsonUser.getString("name"));
                             user.setPhone(jsonUser.getString("phone"));
                             user.setId(jsonUser.getInt("id"));
+                            comment.setAuthor(jsonUser.getInt("id"));
                             user.setDeviceId(jsonUser.getString("device_id"));
 
                             comment.setUser(user);
@@ -358,5 +539,30 @@ public class ForumInfoActivity extends AppCompatActivity {
             return;
         }
         startActivity(intent);
+    }
+    private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+
+        public MyFragmentPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return PagerImageFragment.newInstance(position,forum.getImages().get(position));
+        }
+
+        @Override
+        public int getCount() {
+            return forum.getImages().size();
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (timer!=null){
+            timer.cancel();
+        }
     }
 }

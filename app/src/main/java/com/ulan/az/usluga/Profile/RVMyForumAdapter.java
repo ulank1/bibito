@@ -18,6 +18,7 @@ import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.forum.Forum;
+import com.ulan.az.usluga.forum.ForumInfoActivity;
 import com.ulan.az.usluga.helpers.DataHelper;
 
 import java.util.ArrayList;
@@ -61,6 +62,15 @@ public class RVMyForumAdapter extends RecyclerView.Adapter<RVMyForumAdapter.Pers
                 }
             });
 
+            itemView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, ForumInfoActivity.class);
+                    intent.putExtra("forum", listVse.get(getAdapterPosition()));
+                    context.startActivity(intent);
+                }
+            });
+
 
             category.setVisibility(View.VISIBLE);
             imageView.setOnClickListener(new OnClickListener() {
@@ -81,17 +91,7 @@ public class RVMyForumAdapter extends RecyclerView.Adapter<RVMyForumAdapter.Pers
             mRecyclerView.setLayoutManager(llm);
             mRecyclerView.setHasFixedSize(true);
 
-            itemView.setOnClickListener(new OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-
-             //   context.startActivity(new Intent(context,ServiceMoreInfoActivity.class).putExtra("service",listVse.get(getAdapterPosition())));
-
-                }
-
-
-            });
 
 
         }

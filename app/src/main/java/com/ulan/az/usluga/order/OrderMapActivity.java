@@ -134,8 +134,10 @@ public class OrderMapActivity extends AppCompatActivity {
             TextView name = mView.findViewById(R.id.name);
             final TextView btn = mView.findViewById(R.id.btn_call);
             final ImageView clear = mView.findViewById(R.id.clear);
+            TextView desc = mView.findViewById(R.id.desc);
 
             final Service service = serviceArrayList.get(index);
+            desc.setText(service.getDescription());
             name.setText(service.getUser().getName());
             Glide.with(context).load("http://145.239.33.4:5555"+service.getUser().getImage()).asBitmap().centerCrop().into(new BitmapImageViewTarget(avatar) {
                 @Override

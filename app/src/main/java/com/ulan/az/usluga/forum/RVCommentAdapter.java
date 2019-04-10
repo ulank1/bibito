@@ -72,7 +72,7 @@ public class RVCommentAdapter extends RecyclerView.Adapter<RVCommentAdapter.Pers
     @Override
     public void onBindViewHolder(PersonViewHolder personViewHolder, int i) {
         vse = listVse.get(i);
-        if (vse.getUser().getId()== E.getAppPreferencesINT(E.APP_PREFERENCES_ID,context)){
+        if (vse.getAuthor()== E.getAppPreferencesINT(E.APP_PREFERENCES_ID,context)){
             personViewHolder.each.setVisibility(View.GONE);
             personViewHolder.own.setVisibility(View.VISIBLE);
             personViewHolder.user1.setText(vse.getDate());
@@ -80,7 +80,7 @@ public class RVCommentAdapter extends RecyclerView.Adapter<RVCommentAdapter.Pers
         }else {
             personViewHolder.each.setVisibility(View.VISIBLE);
             personViewHolder.own.setVisibility(View.GONE);
-            personViewHolder.user.setText(vse.getUser().getName());
+            personViewHolder.user.setText(vse.getName());
             personViewHolder.comment.setText(vse.getComment());
         }
 

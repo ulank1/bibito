@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/avatar"
+        android:layout_margin="10dp"
+        android:onClick="onClickPhoto"
+        android:background="@drawable/back_message"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/placeholder_add_image" />
+        <TextView
+            android:textColor="#000"
+            android:gravity="center"
+            android:text="Загрузить фото 1"
+            android:layout_marginLeft="0dp"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/avatar2"
+        android:layout_margin="10dp"
+        android:onClick="onClickPhoto"
+        android:background="@drawable/back_message"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+        <ImageView
+            android:id="@+id/image2"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/placeholder_add_image" />
+        <TextView
+            android:textColor="#000"
+            android:gravity="center"
+            android:text="Загрузить фото 2"
+            android:layout_marginLeft="0dp"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/avatar3"
+        android:layout_margin="10dp"
+        android:onClick="onClickPhoto"
+        android:background="@drawable/back_message"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+        <ImageView
+            android:id="@+id/image3"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/placeholder_add_image" />
+        <TextView
+            android:textColor="#000"
+            android:gravity="center"
+            android:text="Загрузить фото 3"
+            android:layout_marginLeft="0dp"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/avatar4"
+        android:layout_margin="10dp"
+        android:onClick="onClickPhoto"
+        android:background="@drawable/back_message"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+        <ImageView
+            android:id="@+id/image4"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/placeholder_add_image" />
+        <TextView
+            android:textColor="#000"
+            android:gravity="center"
+            android:text="Загрузить фото 4"
+            android:layout_marginLeft="0dp"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/avatar5"
+        android:layout_margin="10dp"
+        android:onClick="onClickPhoto"
+        android:background="@drawable/back_message"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+        <ImageView
+            android:id="@+id/image5"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/placeholder_add_image" />
+        <TextView
+            android:textColor="#000"
+            android:gravity="center"
+            android:text="Загрузить фото 5"
+            android:layout_marginLeft="0dp"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

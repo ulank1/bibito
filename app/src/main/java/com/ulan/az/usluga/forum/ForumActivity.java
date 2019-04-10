@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.ulan.az.usluga.Category.Category;
@@ -20,10 +21,12 @@ import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.User;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.ulan.az.usluga.helpers.Shared;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.util.GeoPoint;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,14 +41,15 @@ public class ForumActivity extends AppCompatActivity {
 
     ArrayList<Forum> serviceArrayList;
     RVForum1CategoryAdapter adapter;
-    FloatingActionButton btnAdd;
+    Button btnAdd;
 
     ProgressBar progressBar;
-
+    ClientApiListener listener;
+    Category category;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sub_category);
+        setContentView(R.layout.activity_forum);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -53,7 +57,7 @@ public class ForumActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressbar);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv);
-        btnAdd = (FloatingActionButton) findViewById(R.id.btn_add);
+        btnAdd =  findViewById(R.id.btn_add);
         btnAdd.setVisibility(View.VISIBLE);
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,7 +68,7 @@ public class ForumActivity extends AppCompatActivity {
 
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
-        final Category category = (Category) getIntent().getSerializableExtra("category");
+        category = (Category) getIntent().getSerializableExtra("category");
 
         getSupportActionBar().setTitle(category.getCategory());
 
@@ -75,7 +79,7 @@ public class ForumActivity extends AppCompatActivity {
                 llm.getOrientation());
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 */
-        final ClientApiListener listener = new ClientApiListener() {
+         listener = new ClientApiListener() {
             @Override
             public void onApiResponse(String id, String json, boolean isOk) {
                 //Log.e("SSSS", "SSSS");
@@ -96,6 +100,12 @@ public class ForumActivity extends AppCompatActivity {
                             forum.setTitle(object.getString("title"));
                             String date = object.getString("updated_at");
 
+                            if (!object.isNull("address"))
+                            forum.setAddress(object.getString("address"));
+
+                            if (!object.isNull("lat"))
+                                forum.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
+
                             forum.setDate(parseDate(date));
 
                             User user = new User();
@@ -107,6 +117,20 @@ public class ForumActivity extends AppCompatActivity {
                             user.setPhone(jsonUser.getString("phone"));
                             user.setDeviceId(jsonUser.getString("device_id"));
                             forum.setUser(user);
+                            ArrayList<String> images = new ArrayList<>();
+
+                            if (!object.getString("image1").equals("null")){
+                                images.add(object.getString("image1"));
+                            } if (!object.getString("image2").equals("null")){
+                                images.add(object.getString("image2"));
+                            }if (!object.getString("image3").equals("null")){
+                                images.add(object.getString("image3"));
+                            } if (!object.getString("image4").equals("null")){
+                                images.add(object.getString("image4"));
+                            } if (!object.getString("image5").equals("null")){
+                                images.add(object.getString("image5"));
+                            }
+                            forum.setImages(images);
                             serviceArrayList.add(forum);
                         }
                         //Log.e("size", serviceArrayList.size() + "");
@@ -215,5 +239,10 @@ public class ForumActivity extends AppCompatActivity {
         }
         String dateString = formatOutput.format(date);
         return dateString;
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ClientApi.requestGet(URLS.forum + "&sub_category=" + category.getId(), listener);
     }
 }

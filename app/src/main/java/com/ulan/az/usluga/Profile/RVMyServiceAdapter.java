@@ -16,6 +16,7 @@ import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.helpers.DataHelper;
 import com.ulan.az.usluga.service.Service;
+import com.ulan.az.usluga.service.ServiceMoreInfoActivity;
 
 import java.util.ArrayList;
 
@@ -47,7 +48,7 @@ public class RVMyServiceAdapter extends RecyclerView.Adapter<RVMyServiceAdapter.
             redactor.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context,RedactorOrderActivity.class);
+                    Intent intent = new Intent(context,RedactorServiceActivity.class);
                     intent.putExtra("service",listVse.get(getAdapterPosition()));
                     context.startActivity(intent);
                 }
@@ -72,7 +73,7 @@ public class RVMyServiceAdapter extends RecyclerView.Adapter<RVMyServiceAdapter.
                 @Override
                 public void onClick(View v) {
 
-             //   context.startActivity(new Intent(context,ServiceMoreInfoActivity.class).putExtra("service",listVse.get(getAdapterPosition())));
+                context.startActivity(new Intent(context,ServiceMoreInfoActivity.class).putExtra("service",listVse.get(getAdapterPosition())));
 
                 }
 
@@ -134,7 +135,7 @@ public class RVMyServiceAdapter extends RecyclerView.Adapter<RVMyServiceAdapter.
     }
 
     public static void delete(int position, int id, Context context, RVMyServiceAdapter rvMyOrderAdapter){
-        ClientApi.requestDelete(id,context);
+        ClientApi.requestDeleteService(id,context);
         DataHelper dataHelper = new DataHelper(context);
         dataHelper.delete(id);
         listVse.remove(position);

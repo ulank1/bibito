@@ -5,19 +5,22 @@ import com.ulan.az.usluga.User;
 import org.osmdroid.util.GeoPoint;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by User on 01.08.2018.
  */
 
 public class Service implements Serializable {
-    String image,address,category,description;
+    String image,address,category,description,info;
     GeoPoint geoPoint;
     double experience;
     User user;
     int id;
     boolean is_favorite;
     int status;
+
+    ArrayList<String> images;
 
     public String getImage() {
         return image;
@@ -97,5 +100,21 @@ public class Service implements Serializable {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public ArrayList<String> getImages() {
+        return images;
+    }
+
+    public void setImages(ArrayList<String> images) {
+        this.images = images;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
     }
 }

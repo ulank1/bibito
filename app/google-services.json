@@ -39,6 +39,14 @@
           }
         },
         {
+          "client_id": "31326772693-igqqc9lbps3bcfe0951p7b69oangddtr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ulan.az.usluga",
+            "certificate_hash": "54de2cf2fd651e7b39be1af5e5f9f8f8f0f2fb6c"
+          }
+        },
+        {
           "client_id": "31326772693-loe2vueork318da1dsksbf9vr947cmg9.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -49,20 +57,13 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "31326772693-loe2vueork318da1dsksbf9vr947cmg9.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }

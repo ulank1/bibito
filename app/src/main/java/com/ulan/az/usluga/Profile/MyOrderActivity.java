@@ -72,8 +72,17 @@ public class MyOrderActivity extends AppCompatActivity {
                             JSONObject jsonUser = object.getJSONObject("user");
                             user.setAge(jsonUser.getString("age"));
                             user.setImage(jsonUser.getString("image"));
+                            user.setId(jsonUser.getInt("id"));
                             user.setName(jsonUser.getString("name"));
                             user.setPhone(jsonUser.getString("phone"));
+                            ArrayList<String> images = new ArrayList<>();
+                            images.add(object.getString("image1"));
+                            images.add(object.getString("image2"));
+                            images.add(object.getString("image3"));
+                            images.add(object.getString("image4"));
+                            images.add(object.getString("image5"));
+
+                            service.setImages(images);
                             service.setUser(user);
                             orders.add(service);
 
@@ -109,6 +118,7 @@ public class MyOrderActivity extends AppCompatActivity {
                                     user.setName(jsonUser.getString("name"));
                                     user.setPhone(jsonUser.getString("phone"));
                                     user.setDeviceId(jsonUser.getString("device_id"));
+
                                     users1.add(user);
 
                                 }

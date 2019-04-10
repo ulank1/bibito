@@ -8,6 +8,10 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by User on 04.08.2018.
  */
@@ -20,6 +24,8 @@ public class E {
     public static final String APP_PREFERENCES_FILTER_CATEGORY_SERVICE = "filter_category_service";
     public static final String APP_PREFERENCES_FILTER_SUBCATEGORY_SERVICE = "filter_subcategory_service";
     public static final String APP_PREFERENCES_FILTER_IS_CHECKED = "filter_is_checked";
+    public static final String APP_PREFERENCES_FILTER_IS_CHECKED_ORDER = "filter_is_checked_order";
+
     public static final String APP_PREFERENCES_NAME = "name";
     public static final String APP_PREFERENCES_ID = "id";
     public static final String APP_PREFERENCES_ID_CATEGORY = "id_category";
@@ -35,10 +41,12 @@ public class E {
        SharedPreferences mSettings = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         return mSettings.getString(s, "");
     }
+
     public static int getAppPreferencesINT(String s,Context context){
         SharedPreferences mSettings = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         return mSettings.getInt(s, -1);
     }
+
     public static boolean getAppPreferencesBoolean(String s,Context context){
         SharedPreferences mSettings = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         return mSettings.getBoolean(s,false);
@@ -96,5 +104,19 @@ public class E {
             //No internet
         }
     }
+    public static String parseDate(String inputDate) {
+        String DATE_FORMAT_I = "yyyy-MM-dd'T'HH:mm:ss";
+        String DATE_FORMAT_O = "yyyy-MM-dd. HH:mm";
 
+        SimpleDateFormat formatInput = new SimpleDateFormat(DATE_FORMAT_I);
+        SimpleDateFormat formatOutput = new SimpleDateFormat(DATE_FORMAT_O);
+        Date date = null;
+        try {
+            date = formatInput.parse(inputDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String dateString = formatOutput.format(date);
+        return dateString;
+    }
 }

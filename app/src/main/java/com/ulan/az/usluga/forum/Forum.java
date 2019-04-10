@@ -2,7 +2,10 @@ package com.ulan.az.usluga.forum;
 
 import com.ulan.az.usluga.User;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by User on 16.08.2018.
@@ -10,10 +13,12 @@ import java.io.Serializable;
 
 public class Forum implements Serializable{
 
-    String title,description,image,date;
+    String title,description,image,date,address;
     int count,id;
     User user;
 
+    GeoPoint geoPoint;
+    ArrayList<String> images;
     public String getTitle() {
         return title;
     }
@@ -68,5 +73,29 @@ public class Forum implements Serializable{
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public GeoPoint getGeoPoint() {
+        return geoPoint;
+    }
+
+    public void setGeoPoint(GeoPoint geoPoint) {
+        this.geoPoint = geoPoint;
+    }
+
+    public ArrayList<String> getImages() {
+        return images;
+    }
+
+    public void setImages(ArrayList<String> images) {
+        this.images = images;
     }
 }

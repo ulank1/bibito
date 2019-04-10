@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -79,6 +81,7 @@
         <activity android:name=".Profile.MyServiceActivity" />
         <activity android:name=".Profile.RedactorForumActivity" />
         <activity android:name=".Profile.RedactorOrderActivity" />
+        <activity android:name=".forum.ForumMapActivity" />
         <activity android:name=".Profile.RedactorServiceActivity" />
         <activity android:name=".Profile.TenderActivity"></activity>
     </application>

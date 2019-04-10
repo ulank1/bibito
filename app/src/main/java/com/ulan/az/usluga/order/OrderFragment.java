@@ -11,6 +11,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,7 +78,7 @@ public class OrderFragment extends Fragment implements FilterListener, Searchlis
             @Override
             public void onClick(View v) {
                 //Log.e("eee","eee");
-                startActivity(new Intent(getActivity(),AddOrderActivity.class));
+                startActivityForResult(new Intent(getActivity(),AddOrderActivity.class),1);
             }
         });
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
@@ -96,6 +97,8 @@ public class OrderFragment extends Fragment implements FilterListener, Searchlis
                             JSONObject object = jsonArray.getJSONObject(i);
                             Service service = new Service();
                             service.setAddress(object.getString("address"));
+                            service.setInfo(object.getString("info"));
+
                             if (object.has("description"))
                             service.setDescription(object.getString("description"));
                             if (!object.isNull("lat"))
@@ -110,11 +113,28 @@ public class OrderFragment extends Fragment implements FilterListener, Searchlis
                             User user = new User();
                             JSONObject jsonUser = object.getJSONObject("user");
                             user.setAge(jsonUser.getString("age"));
+                            user.setId(jsonUser.getInt("id"));
                             user.setImage(jsonUser.getString("image"));
                             user.setName(jsonUser.getString("name"));
                             user.setPhone(jsonUser.getString("phone"));
                             user.setDeviceId(jsonUser.getString("device_id"));
+                            ArrayList<String> images = new ArrayList<>();
 
+                            if (!object.getString("image1").equals("null")){
+                                images.add(object.getString("image1"));
+                            } if (!object.getString("image2").equals("null")){
+                                images.add(object.getString("image2"));
+                            }if (!object.getString("image3").equals("null")){
+                                images.add(object.getString("image3"));
+                            } if (!object.getString("image4").equals("null")){
+                                images.add(object.getString("image4"));
+                            } if (!object.getString("image5").equals("null")){
+                                images.add(object.getString("image5"));
+                            }
+
+                            Log.e("SIAA",images.size()+"");
+
+                            service.setImages(images);
                             service.setUser(user);
 
                             serviceArrayList.add(service);
@@ -166,5 +186,12 @@ public class OrderFragment extends Fragment implements FilterListener, Searchlis
             mRecyclerView.setAdapter(adapter);
         }
 
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ClientApi.requestGet(URLS.order+"&status=1&sub_category="+ Shared.category_id,listener);
     }
 }

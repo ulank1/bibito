@@ -105,7 +105,18 @@ public class MyServiceActivity extends AppCompatActivity {
                             user.setAge(jsonUser.getString("age"));
                             user.setImage(jsonUser.getString("image"));
                             user.setName(jsonUser.getString("name"));
+                            user.setId(jsonUser.getInt("id"));
                             user.setPhone(jsonUser.getString("phone"));
+
+                            ArrayList<String> images = new ArrayList<>();
+                            images.add(object.getString("image1"));
+                            images.add(object.getString("image2"));
+                            images.add(object.getString("image3"));
+                            images.add(object.getString("image4"));
+                            images.add(object.getString("image5"));
+
+                            service.setImages(images);
+
                             service.setUser(user);
                             orders.add(service);
 

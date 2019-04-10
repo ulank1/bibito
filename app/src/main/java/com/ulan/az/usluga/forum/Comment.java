@@ -8,8 +8,9 @@ import com.ulan.az.usluga.User;
 
 public class Comment {
 
-    String comment, date;
+    String comment, date, name;
     User user;
+    int author;
 
 
     public String getComment() {
@@ -34,5 +35,21 @@ public class Comment {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(int author) {
+        this.author = author;
     }
 }

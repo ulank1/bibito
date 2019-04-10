@@ -15,6 +15,7 @@ import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.helpers.DataHelper;
+import com.ulan.az.usluga.order.OrderMoreInfoActivity;
 import com.ulan.az.usluga.service.Service;
 
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class RVMyOrderAdapter extends RecyclerView.Adapter<RVMyOrderAdapter.Pers
                 @Override
                 public void onClick(View v) {
 
-             //   context.startActivity(new Intent(context,ServiceMoreInfoActivity.class).putExtra("service",listVse.get(getAdapterPosition())));
+                    context.startActivity(new Intent(context,OrderMoreInfoActivity.class).putExtra("service",listVse.get(getAdapterPosition())));
 
                 }
 

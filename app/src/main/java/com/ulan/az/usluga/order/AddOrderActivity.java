@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatSpinner;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -35,15 +37,17 @@ import okhttp3.RequestBody;
 
 public class AddOrderActivity extends AppCompatActivity {
     String path = "";
-    EditText address,desc;
+    EditText address,desc,info;
     double lat,lon;
-    Spinner category,subCategory;
+    AppCompatSpinner category;
+    Spinner subCategory;
     ArrayList<String> serviceArrayList;
     ArrayList<Category> categoryArrayList;
     ArrayList<Category> subCategoryArrayList;
     int index=0;
     ProgressBar progressBar;
-
+    final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/jpg");
+    MultipartBody.Builder build;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,16 +57,17 @@ public class AddOrderActivity extends AppCompatActivity {
         address = findViewById(R.id.address);
         desc = findViewById(R.id.desc);
         progressBar = findViewById(R.id.progressbar);
-
+        info = findViewById(R.id.info);
+        build = new MultipartBody.Builder().setType(MultipartBody.FORM);
 
         address.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(AddOrderActivity.this,AddressActivity.class),1);
+                startActivityForResult(new Intent(AddOrderActivity.this,AddressActivity.class),123);
             }
         });
-       category = (Spinner)findViewById(R.id.category);
-       subCategory = (Spinner)findViewById(R.id.sub_category);
+       category = (AppCompatSpinner) findViewById(R.id.category);
+       subCategory = findViewById(R.id.sub_category);
 
        category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
            @Override
@@ -97,8 +102,8 @@ public class AddOrderActivity extends AppCompatActivity {
                                    String[] s = serviceArrayList.toArray(new String[serviceArrayList.size()]);
 
                                    final ArrayAdapter<String> adapter;
-                                   adapter = new ArrayAdapter<String>(AddOrderActivity.this, android.R.layout.simple_spinner_item, s);
-                                   adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                   adapter = new ArrayAdapter<String>(AddOrderActivity.this, R.layout.item_spinner_simple, s);
+                                   adapter.setDropDownViewResource(R.layout.item_spinner_simple);
 
 // Вызываем адаптер
                                    runOnUiThread(new Runnable() {
@@ -158,8 +163,8 @@ public class AddOrderActivity extends AppCompatActivity {
                         String[] s = serviceArrayList.toArray(new String[serviceArrayList.size()]);
 
                         final ArrayAdapter<String> adapter;
-                        adapter = new ArrayAdapter<String>(AddOrderActivity.this, android.R.layout.simple_spinner_item, s);
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        adapter = new ArrayAdapter<String>(AddOrderActivity.this, R.layout.item_spinner_simple, s);
+                        adapter.setDropDownViewResource(R.layout.item_spinner_simple);
 
 // Вызываем адаптер
                         runOnUiThread(new Runnable() {
@@ -185,21 +190,58 @@ public class AddOrderActivity extends AppCompatActivity {
 
     }
 
-    public void FromCard() {
+    public void FromCard(int request) {
         Intent i = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(i, 2);
+        startActivityForResult(i, request);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==2 && resultCode==RESULT_OK && data!=null){
+        if (requestCode==1 && resultCode==RESULT_OK && data!=null){
             Uri imageUri = data.getData();
             path = E.getPath(imageUri,this);
+            build.addFormDataPart("image1", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+            ImageView imageView = findViewById(R.id.image);
+            imageView.setImageURI(imageUri);
         }
-        if (requestCode==1&&resultCode==RESULT_OK&&data!=null){
+
+        else  if (requestCode==2 && resultCode==RESULT_OK && data!=null){
+            Uri imageUri = data.getData();
+            path = E.getPath(imageUri,this);
+            build.addFormDataPart("image2", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+            ImageView imageView = findViewById(R.id.image2);
+            imageView.setImageURI(imageUri);
+        }
+
+        else  if (requestCode==3 && resultCode==RESULT_OK && data!=null){
+            Uri imageUri = data.getData();
+            path = E.getPath(imageUri,this);
+            build.addFormDataPart("image3", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+            ImageView imageView = findViewById(R.id.image3);
+            imageView.setImageURI(imageUri);
+        }
+
+        else  if (requestCode==4 && resultCode==RESULT_OK && data!=null){
+            Uri imageUri = data.getData();
+            path = E.getPath(imageUri,this);
+            build.addFormDataPart("image4", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+            ImageView imageView = findViewById(R.id.image4);
+            imageView.setImageURI(imageUri);
+        }
+
+        else  if (requestCode==5 && resultCode==RESULT_OK && data!=null){
+            Uri imageUri = data.getData();
+            path = E.getPath(imageUri,this);
+            build.addFormDataPart("image5", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+            ImageView imageView = findViewById(R.id.image5);
+            imageView.setImageURI(imageUri);
+        }
+
+
+        if (requestCode==123&&resultCode==RESULT_OK&&data!=null){
             address.setText(data.getStringExtra("address"));
             lat = data.getDoubleExtra("lat",0);
             lon = data.getDoubleExtra("lon",0);
@@ -228,14 +270,20 @@ public class AddOrderActivity extends AppCompatActivity {
             };
 
             final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/jpg");
-            MultipartBody req = new MultipartBody.Builder().setType(MultipartBody.FORM)
+            MultipartBody req;
+
+            build
                     .addFormDataPart("sub_category","/api/v1/subcategory/"+ String.valueOf(subCategoryArrayList.get(subCategory.getSelectedItemPosition()-1).getId())+"/")
-                    .addFormDataPart("user","/api/v1/users/"+String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID,AddOrderActivity.this))+"/")                    .addFormDataPart("address",address.getText().toString())
+                    .addFormDataPart("user","/api/v1/users/"+String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID,AddOrderActivity.this))+"/")
+                    .addFormDataPart("address",address.getText().toString())
+                    .addFormDataPart("info",info.getText().toString())
                     .addFormDataPart("lat", String.valueOf(lat))
                     .addFormDataPart("lng", String.valueOf(lon))
                     .addFormDataPart("status", "1")
-                    .addFormDataPart("description", desc.getText().toString().isEmpty()?"-":desc.getText().toString()).build();
+                    .addFormDataPart("description", desc.getText().toString().isEmpty()?"-":desc.getText().toString());
                     //.addFormDataPart("image",path.split("/")[path.split("/").length-1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+
+            req = build.build();
 
             ClientApi.requestPostImage(URLS.order,req,clientApiListener);
         }
@@ -248,10 +296,14 @@ public class AddOrderActivity extends AppCompatActivity {
             address.setError("добавьте адрес");
             bool = false;
         }
-      /*  if (path.isEmpty()){
+        if (info.getText().toString().isEmpty()){
+            info.setError("добавьте описание");
+            bool = false;
+        }
+        if (path.isEmpty()){
             Toast.makeText(this, "добавьте фото", Toast.LENGTH_SHORT).show();
             bool = false;
-        }*/
+        }
         if (subCategory.getSelectedItemPosition()==0){
             Toast.makeText(this, "Выберите подкатегорию", Toast.LENGTH_SHORT).show();
             bool = false;
@@ -268,5 +320,20 @@ public class AddOrderActivity extends AppCompatActivity {
         finish();
         return super.onOptionsItemSelected(item);
 
+    }
+
+    public void onClickPhoto(View view) {
+        int id = view.getId();
+        if (id == R.id.avatar){
+            FromCard(1);
+        }else if (id == R.id.avatar2){
+            FromCard(2);
+        }else if (id == R.id.avatar3){
+            FromCard(3);
+        }else if (id == R.id.avatar4){
+            FromCard(4);
+        }else if (id == R.id.avatar5){
+            FromCard(5);
+        }
     }
 }

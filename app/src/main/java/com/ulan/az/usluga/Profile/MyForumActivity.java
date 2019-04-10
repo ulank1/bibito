@@ -21,7 +21,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MyForumActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
@@ -57,13 +60,28 @@ public class MyForumActivity extends AppCompatActivity {
                         JSONArray jsonArray = jsonObject.getJSONArray("objects");
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
-                            Forum service = new Forum();
-                            service.setId(object.getInt("id"));
-                            service.setTitle(object.getString("title"));
-                            service.setCount(object.getInt("count"));
-                            service.setDescription(object.getString("description"));
+                            Forum forum = new Forum();
 
-                            orders.add(service);
+                            forum.setCount(object.getInt("count"));
+                            forum.setId(object.getInt("id"));
+                            forum.setDescription(object.getString("description"));
+                            forum.setImage(object.getString("image"));
+                            forum.setTitle(object.getString("title"));
+                            String date = object.getString("updated_at");
+
+                            forum.setDate(parseDate(date));
+
+                            User user = new User();
+                            JSONObject jsonUser = object.getJSONObject("user");
+                            user.setAge(jsonUser.getString("age"));
+                            user.setId(jsonUser.getInt("id"));
+                            user.setImage(jsonUser.getString("image"));
+                            user.setName(jsonUser.getString("name"));
+                            user.setPhone(jsonUser.getString("phone"));
+                            user.setDeviceId(jsonUser.getString("device_id"));
+                            forum.setUser(user);
+
+                            orders.add(forum);
 
                         }
 
@@ -136,4 +154,22 @@ public class MyForumActivity extends AppCompatActivity {
         finish();
         return true;
     }
+
+
+    public String parseDate(String inputDate) {
+        String DATE_FORMAT_I = "yyyy-MM-dd'T'HH:mm:ss";
+        String DATE_FORMAT_O = "yyyy-MM-dd. HH:mm";
+
+        SimpleDateFormat formatInput = new SimpleDateFormat(DATE_FORMAT_I);
+        SimpleDateFormat formatOutput = new SimpleDateFormat(DATE_FORMAT_O);
+        Date date = null;
+        try {
+            date = formatInput.parse(inputDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String dateString = formatOutput.format(date);
+        return dateString;
+    }
+
 }

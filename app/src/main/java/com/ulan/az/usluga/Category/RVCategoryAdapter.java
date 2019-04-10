@@ -25,6 +25,9 @@ public class RVCategoryAdapter extends RecyclerView.Adapter<RVCategoryAdapter.Pe
     int tag;
     String cat;
 
+
+
+
     public class PersonViewHolder extends RecyclerView.ViewHolder {
 
         TextView category;

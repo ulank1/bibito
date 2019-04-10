@@ -118,6 +118,7 @@
             android:padding="20dp">
 
             <Switch
+                android:text="включить/отключить фильтр"
                 android:id="@+id/switch_filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

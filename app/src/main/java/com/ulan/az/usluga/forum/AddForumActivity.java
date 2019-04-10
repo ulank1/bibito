@@ -22,20 +22,24 @@ import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.helpers.E;
 import com.ulan.az.usluga.helpers.Shared;
+import com.ulan.az.usluga.order.AddOrderActivity;
+import com.ulan.az.usluga.order.AddressActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 public class AddForumActivity extends AppCompatActivity {
     String path = "";
     ImageView avatar;
-    EditText address,desc,count;
+    EditText title,desc,count,address;
     double lat,lon;
     Spinner category,subCategory;
     ArrayList<String> serviceArrayList;
@@ -43,18 +47,27 @@ public class AddForumActivity extends AppCompatActivity {
     ArrayList<Category> subCategoryArrayList;
     int index=0;
     ProgressBar progressBar;
+    final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/jpg");
+    MultipartBody.Builder build;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum_add);
+        build = new MultipartBody.Builder().setType(MultipartBody.FORM);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        address = findViewById(R.id.title);
+        title = findViewById(R.id.title);
+        address = findViewById(R.id.address);
         desc = findViewById(R.id.desc);
         count = findViewById(R.id.count);
         progressBar = findViewById(R.id.progressbar);
 
-
+        address.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(AddForumActivity.this,AddressActivity.class),123);
+            }
+        });
 
 
        category = (Spinner)findViewById(R.id.category);
@@ -93,8 +106,8 @@ public class AddForumActivity extends AppCompatActivity {
                                    String[] s = serviceArrayList.toArray(new String[serviceArrayList.size()]);
 
                                    final ArrayAdapter<String> adapter;
-                                   adapter = new ArrayAdapter<String>(AddForumActivity.this, android.R.layout.simple_spinner_item, s);
-                                   adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                   adapter = new ArrayAdapter<String>(AddForumActivity.this, R.layout.item_spinner_simple, s);
+                                   adapter.setDropDownViewResource(R.layout.item_spinner_simple);
 
 // Вызываем адаптер
                                    runOnUiThread(new Runnable() {
@@ -154,8 +167,8 @@ public class AddForumActivity extends AppCompatActivity {
                         String[] s = serviceArrayList.toArray(new String[serviceArrayList.size()]);
 
                         final ArrayAdapter<String> adapter;
-                        adapter = new ArrayAdapter<String>(AddForumActivity.this, android.R.layout.simple_spinner_item, s);
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        adapter = new ArrayAdapter<String>(AddForumActivity.this, R.layout.item_spinner_simple, s);
+                        adapter.setDropDownViewResource(R.layout.item_spinner_simple);
 
 // Вызываем адаптер
                         runOnUiThread(new Runnable() {
@@ -181,25 +194,60 @@ public class AddForumActivity extends AppCompatActivity {
 
     }
 
-    public void FromCard() {
-        Intent i = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(i, 2);
-    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode==2 && resultCode==RESULT_OK && data!=null){
+      /*  if (requestCode==2 && resultCode==RESULT_OK && data!=null){
             Uri imageUri = data.getData();
             path = E.getPath(imageUri,this);
             avatar.setImageURI(imageUri);
-        }
-        if (requestCode==1&&resultCode==RESULT_OK&&data!=null){
+        }*/
+        if (requestCode==123&&resultCode==RESULT_OK&&data!=null){
             address.setText(data.getStringExtra("address"));
             lat = data.getDoubleExtra("lat",0);
             lon = data.getDoubleExtra("lon",0);
+        }
+        if (requestCode==1 && resultCode==RESULT_OK && data!=null){
+            Uri imageUri = data.getData();
+            path = E.getPath(imageUri,this);
+            build.addFormDataPart("image1", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+            ImageView imageView = findViewById(R.id.image);
+            imageView.setImageURI(imageUri);
+        }
+
+        else  if (requestCode==2 && resultCode==RESULT_OK && data!=null){
+            Uri imageUri = data.getData();
+            path = E.getPath(imageUri,this);
+            build.addFormDataPart("image2", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+            ImageView imageView = findViewById(R.id.image2);
+            imageView.setImageURI(imageUri);
+        }
+
+        else  if (requestCode==3 && resultCode==RESULT_OK && data!=null){
+            Uri imageUri = data.getData();
+            path = E.getPath(imageUri,this);
+            build.addFormDataPart("image3", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+            ImageView imageView = findViewById(R.id.image3);
+            imageView.setImageURI(imageUri);
+        }
+
+        else  if (requestCode==4 && resultCode==RESULT_OK && data!=null){
+            Uri imageUri = data.getData();
+            path = E.getPath(imageUri,this);
+            build.addFormDataPart("image4", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+            ImageView imageView = findViewById(R.id.image4);
+            imageView.setImageURI(imageUri);
+        }
+
+        else  if (requestCode==5 && resultCode==RESULT_OK && data!=null){
+            Uri imageUri = data.getData();
+            path = E.getPath(imageUri,this);
+            build.addFormDataPart("image5", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+            ImageView imageView = findViewById(R.id.image5);
+            imageView.setImageURI(imageUri);
         }
 
     }
@@ -227,13 +275,17 @@ public class AddForumActivity extends AppCompatActivity {
             if (countt.isEmpty()){
                 countt="0";
             }
-            final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/jpg");
-            MultipartBody req = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                    .addFormDataPart("sub_category","/api/v1/forumsubcategory/"+ String.valueOf(subCategoryArrayList.get(subCategory.getSelectedItemPosition()-1).getId())+"/")
+            MultipartBody req;
+            build.addFormDataPart("sub_category","/api/v1/forumsubcategory/"+ String.valueOf(subCategoryArrayList.get(subCategory.getSelectedItemPosition()-1).getId())+"/")
                     .addFormDataPart("user","/api/v1/users/"+String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID,AddForumActivity.this))+"/")
-                    .addFormDataPart("title",address.getText().toString())
+                    .addFormDataPart("address",address.getText().toString())
+                    .addFormDataPart("title",title.getText().toString())
+                    .addFormDataPart("lat", String.valueOf(lat))
+                    .addFormDataPart("lng", String.valueOf(lon))
                     .addFormDataPart("count",countt)
-                    .addFormDataPart("description", desc.getText().toString().isEmpty()?"-":desc.getText().toString()).build();
+                    .addFormDataPart("description", desc.getText().toString().isEmpty()?"-":desc.getText().toString());
+
+            req = build.build();
 
             ClientApi.requestPostImage(URLS.forum,req,clientApiListener);
         }
@@ -242,14 +294,18 @@ public class AddForumActivity extends AppCompatActivity {
 
     private boolean isValidate(){
         boolean bool = true;
+        if (title.getText().toString().isEmpty()){
+            title.setError("добавьте название");
+            bool = false;
+        }
         if (address.getText().toString().isEmpty()){
             address.setError("добавьте адрес");
             bool = false;
         }
-      /*  if (path.isEmpty()){
+        if (path.isEmpty()){
             Toast.makeText(this, "добавьте фото", Toast.LENGTH_SHORT).show();
             bool = false;
-        }*/
+        }
         if (subCategory.getSelectedItemPosition()==0){
             Toast.makeText(this, "Выберите подкатегорию", Toast.LENGTH_SHORT).show();
             bool = false;
@@ -267,4 +323,24 @@ public class AddForumActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
 
     }
+    public void onClickPhoto(View view) {
+        int id = view.getId();
+        if (id == R.id.avatar){
+            FromCard(1);
+        }else if (id == R.id.avatar2){
+            FromCard(2);
+        }else if (id == R.id.avatar3){
+            FromCard(3);
+        }else if (id == R.id.avatar4){
+            FromCard(4);
+        }else if (id == R.id.avatar5){
+            FromCard(5);
+        }
+    }
+    public void FromCard(int request) {
+        Intent i = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(i, request);
+    }
+
 }

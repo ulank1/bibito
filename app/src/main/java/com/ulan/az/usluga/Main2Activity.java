@@ -30,6 +30,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -49,6 +50,7 @@ import com.ulan.az.usluga.Profile.MyServiceActivity;
 import com.ulan.az.usluga.Profile.ProfileActivity;
 import com.ulan.az.usluga.Profile.TenderActivity;
 import com.ulan.az.usluga.forum.ForumCategoryFragment;
+import com.ulan.az.usluga.forum.ForumMapActivity;
 import com.ulan.az.usluga.helpers.E;
 import com.ulan.az.usluga.helpers.Shared;
 import com.ulan.az.usluga.helpers.ViewPagerAdapter;
@@ -116,6 +118,22 @@ public class Main2Activity extends AppCompatActivity
         });
         final ImageView imageView = view.findViewById(R.id.imageView);
         TextView textView = view.findViewById(R.id.textView);
+        TextView signOut = view.findViewById(R.id.sign_out);
+        signOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                E.setAppPreferences(E.APP_PREFERENCES_PHONE, context, "");
+                E.setAppPreferences(E.APP_PREFERENCES_ID, context, "");
+                E.setAppPreferences(E.APP_PREFERENCES_NAME, context, "");
+                E.setAppPreferences(E.APP_PREFERENCES_PHOTO, context, "");
+                E.setAppPreferences(E.APP_PREFERENCES_AGE, context, "");
+
+
+                startActivity(new Intent(context,SplashActivity.class));
+                finish();
+
+            }
+        });
         Glide.with(this).load("http://145.239.33.4:5555"+E.getAppPreferences(E.APP_PREFERENCES_PHOTO,context)).asBitmap().centerCrop().into(new BitmapImageViewTarget(imageView) {
             @Override
             protected void setResource(Bitmap resource) {
@@ -215,6 +233,9 @@ public class Main2Activity extends AppCompatActivity
                     startActivity(new Intent(context, ServiceMapActivity.class));
                 }else  if (viewPager.getCurrentItem()==1){
                     startActivity(new Intent(context, OrderMapActivity.class));
+                }else {
+                    startActivity(new Intent(context, ForumMapActivity.class));
+
                 }
             }
         });
@@ -633,8 +654,8 @@ public class Main2Activity extends AppCompatActivity
                                     String[] s = serviceArrayList.toArray(new String[serviceArrayList.size()]);
 
                                     final ArrayAdapter<String> adapter;
-                                    adapter = new ArrayAdapter<String>(Main2Activity.this, android.R.layout.simple_spinner_item, s);
-                                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                    adapter = new ArrayAdapter<String>(Main2Activity.this, R.layout.item_spinner_simple, s);
+                                    adapter.setDropDownViewResource(R.layout.item_spinner_simple);
 
 // Вызываем адаптер
                                     runOnUiThread(new Runnable() {
@@ -703,8 +724,8 @@ public class Main2Activity extends AppCompatActivity
                         String[] s = serviceArrayList.toArray(new String[serviceArrayList.size()]);
 
                         final ArrayAdapter<String> adapter;
-                        adapter = new ArrayAdapter<String>(Main2Activity.this, android.R.layout.simple_spinner_item, s);
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        adapter = new ArrayAdapter<String>(Main2Activity.this, R.layout.item_spinner_simple, s);
+                        adapter.setDropDownViewResource(R.layout.item_spinner_simple);
 
 // Вызываем адаптер
                         runOnUiThread(new Runnable() {
@@ -764,8 +785,8 @@ public class Main2Activity extends AppCompatActivity
                         String[] s = serviceArrayList.toArray(new String[serviceArrayList.size()]);
 
                         final ArrayAdapter<String> adapter;
-                        adapter = new ArrayAdapter<String>(Main2Activity.this, android.R.layout.simple_spinner_item, s);
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        adapter = new ArrayAdapter<String>(Main2Activity.this, R.layout.item_spinner_simple, s);
+                        adapter.setDropDownViewResource(R.layout.item_spinner_simple);
 
 // Вызываем адаптер
                         runOnUiThread(new Runnable() {
@@ -800,6 +821,8 @@ public class Main2Activity extends AppCompatActivity
         initSpinnerData();
         relativeLayout.setVisibility(View.GONE);
         lineSearch.setVisibility(View.GONE);
+        imgSearch.setVisibility(View.GONE);
+
         if (position != 2) {
             filter.setVisibility(View.VISIBLE);
             imgMap.setVisibility(View.VISIBLE);
@@ -811,7 +834,6 @@ public class Main2Activity extends AppCompatActivity
             }
         } else {
             filter.setVisibility(View.GONE);
-            imgMap.setVisibility(View.GONE);
         }
     }
 
@@ -821,5 +843,13 @@ public class Main2Activity extends AppCompatActivity
         Intent intent = getIntent();
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (viewPager.getCurrentItem()==0) serviceApiListener.onFilter(0);
+        else if (viewPager.getCurrentItem()==1) orderApiListener.onFilter(0);
+        else if (viewPager.getCurrentItem()==2) serviceApiListener.onFilter(0);
     }
 }

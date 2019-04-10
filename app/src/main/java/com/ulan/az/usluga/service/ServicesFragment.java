@@ -81,7 +81,7 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
             @Override
             public void onClick(View v) {
                 //Log.e("eee","eee");
-                startActivity(new Intent(getActivity(), AddServiceActivity.class));
+                startActivityForResult(new Intent(getActivity(), AddServiceActivity.class),1);
             }
         });
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
@@ -102,6 +102,8 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
                             JSONObject object = jsonArray.getJSONObject(i);
                             Service service = new Service();
                             service.setAddress(object.getString("address"));
+                            service.setInfo(object.getString("info"));
+
                             if (!object.isNull("experience"))
                                 service.setExperience(object.getDouble("experience"));
                             if (!object.isNull("lat"))
@@ -120,7 +122,23 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
                             user.setPhone(jsonUser.getString("phone"));
                             user.setId(jsonUser.getInt("id"));
                             user.setDeviceId(jsonUser.getString("device_id"));
+                            ArrayList<String> images = new ArrayList<>();
 
+                            if (!object.getString("image1").equals("null")){
+                                images.add(object.getString("image1"));
+                            } if (!object.getString("image2").equals("null")){
+                                images.add(object.getString("image2"));
+                            }if (!object.getString("image3").equals("null")){
+                                images.add(object.getString("image3"));
+                            } if (!object.getString("image4").equals("null")){
+                                images.add(object.getString("image4"));
+                            } if (!object.getString("image5").equals("null")){
+                                images.add(object.getString("image5"));
+                            }
+
+                            Log.e("SIAA",images.size()+"");
+
+                            service.setImages(images);
                             service.setUser(user);
 
                             serviceArrayList.add(service);
@@ -181,5 +199,11 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
             mRecyclerView.setAdapter(adapter);
         }
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ClientApi.requestGet(URLS.services + "&sub_category=" + Shared.category_id, listener);
     }
 }
