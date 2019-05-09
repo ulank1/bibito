@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.ulan.az.usluga.Category.Category;
@@ -63,6 +64,14 @@ public class ForumActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(ForumActivity.this,AddForumActivity.class));
+            }
+        });
+
+        ImageView map = findViewById(R.id.map);
+        map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ForumActivity.this, ForumMapActivity.class).putExtra("category_id",category.getId()));
             }
         });
 

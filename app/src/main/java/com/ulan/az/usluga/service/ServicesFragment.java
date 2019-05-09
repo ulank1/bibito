@@ -94,12 +94,14 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
 
                 if (isOk) {
                     try {
+
                         JSONObject jsonObject = new JSONObject(json);
                         serviceArrayList = new ArrayList<>();
                         JSONArray jsonArray = jsonObject.getJSONArray("objects");
                         for (int i = 0; i < jsonArray.length(); i++) {
                             boolean bool = true;
                             JSONObject object = jsonArray.getJSONObject(i);
+                            //Log.e("Json",jsonArray.length()+"  "+i+object.toString());
                             Service service = new Service();
                             service.setAddress(object.getString("address"));
                             service.setInfo(object.getString("info"));
@@ -110,6 +112,7 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
                                 service.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
                             else service.setGeoPoint(new GeoPoint(0, 0));
                             service.setImage(object.getString("image"));
+                            if (object.isNull("sub_category")) continue;
                             if (object.has("description"))
                                 service.setDescription(object.getString("description"));
                             service.setCategory(object.getJSONObject("sub_category").getJSONObject("category").getString("category")+" -> "+object.getJSONObject("sub_category").getString("sub_category"));

@@ -61,7 +61,6 @@ public class ForumMapActivity extends AppCompatActivity {
         listener = new ClientApiListener() {
             @Override
             public void onApiResponse(String id, String json, boolean isOk) {
-                //Log.e("SSSS", "SSSS");
                 if (isOk) {
                     try {
                         JSONObject jsonObject = new JSONObject(json);
@@ -71,22 +70,17 @@ public class ForumMapActivity extends AppCompatActivity {
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
                             final Forum forum = new Forum();
-
                             forum.setCount(object.getInt("count"));
                             forum.setId(object.getInt("id"));
                             forum.setDescription(object.getString("description"));
                             forum.setImage(object.getString("image"));
                             forum.setTitle(object.getString("title"));
                             String date = object.getString("updated_at");
-
                             if (!object.isNull("address"))
                                 forum.setAddress(object.getString("address"));
-
                             if (!object.isNull("lat"))
                                 forum.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
-
                             forum.setDate(E.parseDate(date));
-
                             User user = new User();
                             JSONObject jsonUser = object.getJSONObject("user");
                             user.setAge(jsonUser.getString("age"));
@@ -119,7 +113,7 @@ public class ForumMapActivity extends AppCompatActivity {
             }
         };
 
-        ClientApi.requestGet(URLS.forum, listener);
+        ClientApi.requestGet(URLS.forum+ "&sub_category=" + getIntent().getIntExtra("category_id",1), listener);
 
 
     }

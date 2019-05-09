@@ -821,8 +821,7 @@ public class Main2Activity extends AppCompatActivity
         initSpinnerData();
         relativeLayout.setVisibility(View.GONE);
         lineSearch.setVisibility(View.GONE);
-        imgSearch.setVisibility(View.GONE);
-
+        imgMap.setVisibility(View.GONE);
         if (position != 2) {
             filter.setVisibility(View.VISIBLE);
             imgMap.setVisibility(View.VISIBLE);

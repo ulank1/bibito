@@ -30,7 +30,6 @@ public class URLS {
     public static String comment = root+"api/v1/comment/?format=json&limit=0";
     public static String comment_service = root+"api/v1/comment_service/?format=json&limit=0";
     public static String comment_order = root+"api/v1/comment_order/?format=json&limit=0";
-
     public static String like_order = root+"api/v1/like_order/?format=json&limit=0";
     public static String like_order_put = root+"api/v1/like_order/";
     public static String like_service = root+"api/v1/like_service/?format=json&limit=0";
