@@ -1,5 +1,6 @@
 package com.ulan.az.usluga.forum;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,21 +9,30 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.ulan.az.usluga.Category.Category;
 import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.ClientApiListener;
+import com.ulan.az.usluga.LocationActivity;
 import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.URLS;
 import com.ulan.az.usluga.User;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.ulan.az.usluga.helpers.Shared;
+import com.ulan.az.usluga.service.Service;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +42,8 @@ import org.osmdroid.util.GeoPoint;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 public class ForumActivity extends AppCompatActivity {
@@ -47,6 +59,13 @@ public class ForumActivity extends AppCompatActivity {
     ProgressBar progressBar;
     ClientApiListener listener;
     Category category;
+
+    LinearLayout lineSearch;
+    EditText editSearch;
+
+    boolean is_search = false;
+    String search_text = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +75,9 @@ public class ForumActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         progressBar = findViewById(R.id.progressbar);
+
+        editSearch = findViewById(R.id.edit_search);
+        lineSearch = findViewById(R.id.line1);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv);
         btnAdd =  findViewById(R.id.btn_add);
@@ -165,63 +187,88 @@ public class ForumActivity extends AppCompatActivity {
         ClientApi.requestGet(URLS.forum + "&sub_category=" + category.getId(), listener);
 
 
-        searchView = (MaterialSearchView) findViewById(R.id.search_view);
-        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+
+       /* searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-
-
-                ArrayList<Forum> categories1 = new ArrayList<>();
-
-                for (Forum category : serviceArrayList) {
-                    String s = category.getTitle().toLowerCase();
-                    if (s.contains(query.toLowerCase())) {
-                        categories1.add(category);
-                    }
-                }
-
-
-                if (categories1.size() == 0) {
-                    adapter = new RVForum1CategoryAdapter(ForumActivity.this, serviceArrayList);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRecyclerView.setAdapter(adapter);
-                        }
-                    });
-                } else {
-
-                    adapter = new RVForum1CategoryAdapter(ForumActivity.this, categories1);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRecyclerView.setAdapter(adapter);
-                        }
-                    });
-                }
-
-                return true;
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                startActivity(new Intent(ForumActivity.this,LocationActivity.class));
             }
+        });*/
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                //Do some magic
-                return false;
-            }
-        });
+       editSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+           @Override
+           public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+               if (i == EditorInfo.IME_ACTION_SEARCH) {
+                   String query = textView.getText().toString();
+                   ArrayList<Forum> categories1 = new ArrayList<>();
+                   Shared.is_search = true;
+                   Shared.search_text = query;
 
+                   for (Forum category : serviceArrayList) {
+                       String s = category.getTitle().toLowerCase();
+                       if (s.contains(query.toLowerCase())) {
+                           categories1.add(category);
+                       }
+                   }
+
+                   Collections.sort(categories1, new Comparator<Forum>() {
+                       @Override
+                       public int compare(Forum lhs, Forum rhs) {
+                           // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                           //  return Mathlhs.getGeoPoint().getLatitude() > rhs.customInt ? -1 : (lhs.customInt < rhs.customInt) ? 1 : 0;
+
+                           double x1, x2, xe, y1, y2, ye, s1, s2;
+
+                           x1 = lhs.getGeoPoint().getLatitude();
+                           x2 = rhs.getGeoPoint().getLatitude();
+                           y1 = lhs.getGeoPoint().getLongitude();
+                           y2 = rhs.getGeoPoint().getLongitude();
+                           xe = Shared.lat_search;
+                           ye = Shared.lon_search;
+
+                           s1 = Math.sqrt(Math.abs(x1 - xe) * Math.abs(x1 - xe) + Math.abs(y1 - ye) * Math.abs(y1 - ye));
+                           s2 = Math.sqrt(Math.abs(x2 - xe) * Math.abs(x2 - xe) + Math.abs(y2 - ye) * Math.abs(y2 - ye));
+
+                           return Double.compare(s2, s1);
+
+                       }
+                   });
+                    lineSearch.setVisibility(View.GONE);
+                   if (categories1.size() == 0) {
+                       adapter = new RVForum1CategoryAdapter(ForumActivity.this, serviceArrayList);
+                       runOnUiThread(new Runnable() {
+                           @Override
+                           public void run() {
+                               mRecyclerView.setAdapter(adapter);
+                           }
+                       });
+                   } else {
+
+                       adapter = new RVForum1CategoryAdapter(ForumActivity.this, categories1);
+                       runOnUiThread(new Runnable() {
+                           @Override
+                           public void run() {
+                               mRecyclerView.setAdapter(adapter);
+                           }
+                       });
+                   }
+
+                   InputMethodManager imm = (InputMethodManager) textView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                   if (imm != null) {
+                       imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                   }
+                   return true;
+               }
+
+               return false;
+           }
+       });
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_category, menu);
-
-        MenuItem item = menu.findItem(R.id.action_search);
-        //Log.e("DDD", item.toString());
-        searchView.setMenuItem(item);
-
         return true;
     }
 
@@ -230,6 +277,10 @@ public class ForumActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == android.R.id.home)
             finish();
+        else if (id==R.id.action_search){
+            lineSearch.setVisibility(View.VISIBLE);
+            startActivity(new Intent(this,LocationActivity.class));
+        }
         return true;
     }
 
@@ -253,5 +304,22 @@ public class ForumActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ClientApi.requestGet(URLS.forum + "&sub_category=" + category.getId(), listener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Shared.is_search = false;
+
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (lineSearch.getVisibility() == View.VISIBLE){
+            lineSearch.setVisibility(View.GONE);
+        }else {
+           super.onBackPressed();
+        }
     }
 }

@@ -189,7 +189,7 @@ public class RedactorOrderActivity extends AppCompatActivity {
 
             req = build.build();
 
-            ClientApi.requesPutImage(URLS.order_delete + service.getId()+"/",req,clientApiListener);
+            ClientApi.requesPutImage(URLS.order_delete + service.getId()+"/",req,clientApiListener,this);
         }
 
     }

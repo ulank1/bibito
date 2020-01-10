@@ -1,6 +1,7 @@
 package com.ulan.az.usluga;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.ulan.az.usluga.service.ImageActivity;
 
 
 /**
@@ -50,7 +52,12 @@ public class PagerImageFragment extends Fragment {
         Log.e("IMAGE",url);
 
         Glide.with(this).load("http://145.239.33.4:5555"+url).placeholder(R.drawable.placeholder_image).into(imageView);
-
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().startActivity(new Intent(getActivity(), ImageActivity.class).putExtra("url","http://145.239.33.4:5555"+url));
+            }
+        });
         return view;
     }
 

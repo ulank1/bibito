@@ -1,5 +1,7 @@
 package com.ulan.az.usluga.helpers;
 
+import android.location.Location;
+
 import com.ulan.az.usluga.Category.Category;
 import com.ulan.az.usluga.service.Service;
 
@@ -12,8 +14,13 @@ import java.util.ArrayList;
 public class Shared {
 
     public static int category_id;
+    public static boolean is_search = false;
+    public static String search_text;
+    public static double lat_search = 0;
+    public static double lon_search = 0;
     public static int category_id_order;
     public static String mobile;
+    public static Location location;
     public static ArrayList<Service> orderCategories;
     public static ArrayList<Service> serviceCategories;
     public static ArrayList<Category> forumCategories;

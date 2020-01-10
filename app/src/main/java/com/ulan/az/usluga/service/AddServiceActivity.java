@@ -305,7 +305,7 @@ public class AddServiceActivity extends AppCompatActivity {
 
             req = build.build();
 
-            ClientApi.requestPostImage(URLS.services,req,clientApiListener);
+            ClientApi.requestPostImage(URLS.services,req,clientApiListener,this);
         }
 
     }

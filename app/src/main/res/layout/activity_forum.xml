@@ -45,10 +45,7 @@
 
                 </LinearLayout>
             </android.support.v7.widget.Toolbar>
-            <com.miguelcatalan.materialsearchview.MaterialSearchView
-                android:id="@+id/search_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+
         </RelativeLayout>
 
     </android.support.design.widget.AppBarLayout>
@@ -78,6 +75,23 @@
         android:paddingRight="25dp"
         android:text="Создать комнату"
         android:textColor="#fff" />
+
+
+    <LinearLayout
+        android:visibility="gone"
+        android:background="#fff"
+        android:id="@+id/line1"
+        android:layout_below="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:hint="Поиск"
+            android:id="@+id/edit_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
     <ProgressBar
         android:visibility="gone"
         android:layout_centerInParent="true"

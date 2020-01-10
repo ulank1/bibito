@@ -147,7 +147,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             RequestBody requestBody = req.build();
 
-            ClientApi.requesPutImage(URLS.users_put + E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context) + "/", requestBody, clientApiListener);
+            ClientApi.requesPutImage(URLS.users_put + E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context) + "/", requestBody, clientApiListener,this);
         }
     }
 

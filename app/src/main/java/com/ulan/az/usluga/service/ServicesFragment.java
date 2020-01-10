@@ -94,6 +94,7 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
 
                 if (isOk) {
                     try {
+                        Log.e("JSON_Service",json);
 
                         JSONObject jsonObject = new JSONObject(json);
                         serviceArrayList = new ArrayList<>();
@@ -139,7 +140,6 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
                                 images.add(object.getString("image5"));
                             }
 
-                            Log.e("SIAA",images.size()+"");
 
                             service.setImages(images);
                             service.setUser(user);
@@ -168,7 +168,7 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
         progressBar.setVisibility(View.VISIBLE);
         if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED, getContext())) {
             Log.e("Category_id", Shared.category_id + "");
-            ClientApi.requestGet(URLS.services + "&sub_category=" + Shared.category_id, listener);
+            ClientApi.requestGet(URLS.services + "&sub_category=" + E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_SUBCATEGORY_SERVICE,getContext()), listener);
         } else ClientApi.requestGet(URLS.services, listener);
 
 
@@ -187,7 +187,7 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
 
         if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED, getContext())) {
             Log.e("Category_id", Shared.category_id + "");
-            ClientApi.requestGet(URLS.services + "&sub_category=" + Shared.category_id, listener);
+            ClientApi.requestGet(URLS.services + "&sub_category=" + E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_SUBCATEGORY_SERVICE,getContext()), listener);
         } else ClientApi.requestGet(URLS.services, listener);
 
     }
@@ -207,6 +207,6 @@ public class ServicesFragment extends Fragment implements FilterListener, Search
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        ClientApi.requestGet(URLS.services + "&sub_category=" + Shared.category_id, listener);
+        ClientApi.requestGet(URLS.services + "&sub_category=" + E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_SUBCATEGORY_SERVICE,getContext()), listener);
     }
 }

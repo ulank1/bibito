@@ -29,6 +29,9 @@ public class E {
     public static final String APP_PREFERENCES_NAME = "name";
     public static final String APP_PREFERENCES_ID = "id";
     public static final String APP_PREFERENCES_ID_CATEGORY = "id_category";
+    public static final String APP_PREFERENCES_ID_CATEGORY_ORDER = "id_category_order";
+    public static final String APP_PREFERENCES_ID_SUB_CATEGORY = "id_sub_category";
+    public static final String APP_PREFERENCES_ID_SUB_CATEGORY_ORDER = "id_sub_category_order";
     public static final String APP_PREFERENCES_PHOTO = "photo";
     public static final String APP_PREFERENCES_PHONE = "phone";
     public static final String APP_PREFERENCES_AGE = "age";

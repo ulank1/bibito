@@ -117,7 +117,7 @@ public class RedactorForumActivity extends AppCompatActivity {
                     .addFormDataPart("count",countt)
                     .addFormDataPart("description", desc.getText().toString().isEmpty()?"-":desc.getText().toString()).build();
 
-            ClientApi.requesPutImage(URLS.forum_put+service.getId()+"/",req,clientApiListener);
+            ClientApi.requesPutImage(URLS.forum_put+service.getId()+"/",req,clientApiListener,this);
         }
 
     }

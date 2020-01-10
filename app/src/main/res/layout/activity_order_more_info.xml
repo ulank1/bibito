@@ -241,6 +241,15 @@
                     android:textColor="#fff"
                     android:visibility="visible" />
 
+                <android.support.v7.widget.RecyclerView
+                    android:layout_margin="20dp"
+                    android:id="@+id/rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false">
+
+                </android.support.v7.widget.RecyclerView>
+
                 <include layout="@layout/review"/>
 
             </LinearLayout>

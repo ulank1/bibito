@@ -287,7 +287,7 @@ public class AddForumActivity extends AppCompatActivity {
 
             req = build.build();
 
-            ClientApi.requestPostImage(URLS.forum,req,clientApiListener);
+            ClientApi.requestPostImage(URLS.forum,req,clientApiListener,this);
         }
 
     }

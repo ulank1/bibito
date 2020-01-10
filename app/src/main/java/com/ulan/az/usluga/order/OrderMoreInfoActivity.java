@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +19,8 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -39,13 +43,17 @@ import com.ulan.az.usluga.MapViewO;
 import com.ulan.az.usluga.PagerImageFragment;
 import com.ulan.az.usluga.R;
 import com.ulan.az.usluga.URLS;
+import com.ulan.az.usluga.User;
 import com.ulan.az.usluga.forum.Comment;
 import com.ulan.az.usluga.forum.RVCommentAdapter;
 import com.ulan.az.usluga.helpers.E;
 import com.ulan.az.usluga.helpers.Shared;
 import com.ulan.az.usluga.service.AddServiceActivity;
+import com.ulan.az.usluga.service.RVAdditionalServiceAdapter;
 import com.ulan.az.usluga.service.Service;
 import com.ulan.az.usluga.service.ServiceMoreInfoActivity;
+import com.ulan.az.usluga.tender.TenderOrderActivity;
+import com.ulan.az.usluga.tender.service.TenderServiceActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,18 +79,23 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class OrderMoreInfoActivity extends AppCompatActivity {
+    RecyclerView mRecyclerView;
+
+    ArrayList<Service> serviceArrayList;
+
+    RVAdditionalServiceAdapter adapter;
 
     TextView name;
     ImageView avatar;
-    Button button,buttonCall;
+    Button button, buttonCall;
     AlertDialog.Builder ad;
     Service service;
     MapViewO mapView;
     Timer timer;
     ViewPager pager;
 
-    ImageView share,like,callPhone;
-    TextView textLike,phone,address,title;
+    ImageView share, like, callPhone;
+    TextView textLike, phone, address, title;
     int isLike = 0;
     int likeCount;
     Context context;
@@ -92,9 +105,17 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_more_info);
-        
+
         context = this;
-        
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv);
+
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(context, LinearLayoutManager.VERTICAL));
+
+        LinearLayoutManager llm = new LinearLayoutManager(context);
+        mRecyclerView.setLayoutManager(llm);
+        mRecyclerView.setHasFixedSize(true);
+
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         name = findViewById(R.id.name);
         avatar = findViewById(R.id.avatar);
@@ -127,7 +148,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
         initReview();
         RelativeLayout relativeLayout = findViewById(R.id.relative);
         pager = (ViewPager) findViewById(R.id.viewpager);
-        if (service.getImages()!=null&&service.getImages().size()>0) {
+        if (service.getImages() != null && service.getImages().size() > 0) {
             relativeLayout.setVisibility(View.VISIBLE);
             MyFragmentPagerAdapter pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
             pager.setAdapter(pagerAdapter);
@@ -139,9 +160,9 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     final int pos;
-                    if (pager.getCurrentItem()+1==service.getImages().size())
+                    if (pager.getCurrentItem() + 1 == service.getImages().size())
                         pos = 0;
-                    else pos = pager.getCurrentItem()+1;
+                    else pos = pager.getCurrentItem() + 1;
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -149,14 +170,14 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                         }
                     });
                 }
-            },10000,10000);
-        }else {
+            }, 10000, 10000);
+        } else {
             ImageView imageView = findViewById(R.id.placeholder);
             imageView.setVisibility(View.VISIBLE);
         }
 
         mapView.getController().setCenter(service.getGeoPoint());
-        addMarker(service.getGeoPoint(),0);
+        addMarker(service.getGeoPoint(), 0);
         ClientApiListener listener = new ClientApiListener() {
             @Override
             public void onApiResponse(final String id, String json, boolean isOk) {
@@ -172,23 +193,23 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                         });
                     }
 
-                    } catch(JSONException e){
-                        e.printStackTrace();
-                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
             }
         };
-        if (service.getUser().getId()==E.getAppPreferencesINT(E.APP_PREFERENCES_ID,this)){
+        if (service.getUser().getId() == E.getAppPreferencesINT(E.APP_PREFERENCES_ID, this)) {
             button.setVisibility(View.GONE);
         }
 
-        ClientApi.requestGet(URLS.confirm+"&order="+service.getId()+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context)),listener);
+        ClientApi.requestGet(URLS.confirm + "&order=" + service.getId() + "&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context)), listener);
 
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ClientApiListener listener = new ClientApiListener() {
+            /*    ClientApiListener listener = new ClientApiListener() {
                     @Override
                     public void onApiResponse(String id, String json, boolean isOk) {
 
@@ -219,7 +240,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                                             .addFormDataPart("user", "/api/v1/users/" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context)) + "/")
                                             .addFormDataPart("order", "/api/v1/order/" + String.valueOf(service.getId()) + "/").build();
 
-                                    ClientApi.requestPostImage(URLS.confirm, req, listener1);
+                                    ClientApi.requestPostImage(URLS.confirm, req, listener1,OrderMoreInfoActivity.this);
 
                                 }else {
                                     runOnUiThread(new Runnable() {
@@ -240,8 +261,71 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                 };
                 Log.e("DDDDDD","&sub_category__sub_category="+service.getCategory()+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context)));
                 ClientApi.requestGet(URLS.services+"&sub_category__sub_category="+service.getCategory()+"&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context)),listener);
+       */
+
+
+                startActivityForResult(new Intent(OrderMoreInfoActivity.this, TenderServiceActivity.class).putExtra("service_id",service.getId()),6);
+
             }
         });
+
+
+        listener = new ClientApiListener() {
+            @Override
+            public void onApiResponse(String id, String json, boolean isOk) {
+
+                        Log.e("SERVICES",json);
+                if (isOk) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(json);
+                        serviceArrayList = new ArrayList<>();
+                        JSONArray jsonArray = jsonObject.getJSONArray("objects");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            boolean bool = true;
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            Service service = new Service();
+                            service.setAddress(object.getString("address"));
+                            if (!object.isNull("experience"))
+                                service.setExperience(object.getDouble("experience"));
+                            if (!object.isNull("lat"))
+                                service.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
+                            else service.setGeoPoint(new GeoPoint(0, 0));
+                            service.setImage(object.getString("image"));
+                            if (object.has("description"))
+                                service.setDescription(object.getString("description"));
+                            service.setCategory(object.getJSONObject("sub_category").getJSONObject("category").getString("category") + " -> " + object.getJSONObject("sub_category").getString("sub_category"));
+                            service.setId(object.getInt("id"));
+                            User user = new User();
+                            JSONObject jsonUser = object.getJSONObject("user");
+                            user.setAge(jsonUser.getString("age"));
+                            user.setImage(jsonUser.getString("image"));
+                            user.setName(jsonUser.getString("name"));
+                            user.setPhone(jsonUser.getString("phone"));
+                            user.setId(jsonUser.getInt("id"));
+                            service.setUser(user);
+
+                            serviceArrayList.add(service);
+
+                        }
+                        Shared.serviceCategories = serviceArrayList;
+                        adapter = new RVAdditionalServiceAdapter(context, serviceArrayList);
+
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                // things to do on the main thread
+                                mRecyclerView.setAdapter(adapter);
+                            }
+                        });
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        ClientApi.requestGet(URLS.order + "&user=" + service.getUser().getId(), listener);
+
 
 
         getSupportActionBar().setTitle(service.getCategory());
@@ -250,7 +334,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
         }
         name.setText(service.getUser().getName() + "");
 
-        Glide.with(this).load("http://145.239.33.4:5555"+service.getUser().getImage()).asBitmap().centerCrop().into(new BitmapImageViewTarget(avatar) {
+        Glide.with(this).load("http://145.239.33.4:5555" + service.getUser().getImage()).asBitmap().centerCrop().into(new BitmapImageViewTarget(avatar) {
             @Override
             protected void setResource(Bitmap resource) {
                 RoundedBitmapDrawable circularBitmapDrawable =
@@ -264,13 +348,24 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, MapActivity.class);
-                intent.putExtra("lat",service.getGeoPoint().getLatitude());
-                intent.putExtra("lon",service.getGeoPoint().getLongitude());
+                intent.putExtra("lat", service.getGeoPoint().getLatitude());
+                intent.putExtra("lon", service.getGeoPoint().getLongitude());
                 startActivity(intent);
             }
         });
 
 
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==6){
+            Intent intent = getIntent();
+            startActivity(intent);
+            finish();
+        }
     }
 
     private void init() {
@@ -287,9 +382,9 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String text ="Категория : " + service.getCategory()+
-                        "\nTелефон : " +service.getUser().getPhone()+
-                        "\nОписание : "+ service.getDescription()+"";
+                String text = "Категория : " + service.getCategory() +
+                        "\nTелефон : " + service.getUser().getPhone() +
+                        "\nОписание : " + service.getDescription() + "";
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -329,20 +424,20 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isLike!=0){
+                if (isLike != 0) {
 
-                    ClientApi.requestDelete1(URLS.like_order_put,isLike,context);
+                    ClientApi.requestDelete1(URLS.like_order_put, isLike, context);
                     like.setImageResource(R.drawable.like_inactive);
                     likeCount--;
-                    textLike.setText("Нравится "+likeCount);
-                    isLike=0;
+                    textLike.setText("Нравится " + likeCount);
+                    isLike = 0;
 
-                }else {
+                } else {
                     ClientApiListener listener1 = new ClientApiListener() {
                         @Override
                         public void onApiResponse(String id, String json, boolean isOk) {
-                            Log.e("dddsssdcx",json);
-                            if (json.isEmpty()){
+                            Log.e("dddsssdcx", json);
+                            if (json.isEmpty()) {
                                 getLikes();
                             }
 
@@ -350,10 +445,10 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                     };
 
                     MultipartBody.Builder req = new MultipartBody.Builder().setType(MultipartBody.FORM);
-                    req.addFormDataPart("user_id_owner", E.getAppPreferencesINT(E.APP_PREFERENCES_ID,context)+"");
-                    req.addFormDataPart("type_id", service.getId()+"");
+                    req.addFormDataPart("user_id_owner", E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context) + "");
+                    req.addFormDataPart("type_id", service.getId() + "");
                     RequestBody requestBody = req.build();
-                    ClientApi.requestPostImage(URLS.like_order_put,requestBody,listener1);
+                    ClientApi.requestPostImage(URLS.like_order_put, requestBody, listener1, OrderMoreInfoActivity.this);
 
                 }
             }
@@ -369,7 +464,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
     public void initReview() {
         getComments();
         RelativeLayout send;
-        send = findViewById(R.id.btn_send );
+        send = findViewById(R.id.btn_send);
         editSend = findViewById(R.id.edit_comment);
         recyclerView = findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -378,12 +473,12 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if (!editSend.getText().toString().isEmpty()){
+                if (!editSend.getText().toString().isEmpty()) {
 
                     ClientApiListener listener = new ClientApiListener() {
                         @Override
                         public void onApiResponse(String id, String json, boolean isOk) {
-                            Log.e("JSON",json);
+                            Log.e("JSON", json);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -396,12 +491,12 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
 
                     final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/jpg");
                     MultipartBody req = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                            .addFormDataPart("service",service.getId()+"")
-                            .addFormDataPart("name",service.getUser().getName()+"")
-                            .addFormDataPart("author",String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID,OrderMoreInfoActivity.this))+"")
-                            .addFormDataPart("comment",editSend.getText().toString()).build();
+                            .addFormDataPart("service", service.getId() + "")
+                            .addFormDataPart("name", service.getUser().getName() + "")
+                            .addFormDataPart("author", String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, OrderMoreInfoActivity.this)) + "")
+                            .addFormDataPart("comment", editSend.getText().toString()).build();
 
-                    ClientApi.requestPostImage(URLS.comment_order,req,listener);
+                    ClientApi.requestPostImage(URLS.comment_order, req, listener, OrderMoreInfoActivity.this);
 
                 }
             }
@@ -410,7 +505,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
 
 
     public void getComments() {
-        final ArrayList<Comment> comments  =new ArrayList<>();
+        final ArrayList<Comment> comments = new ArrayList<>();
         ClientApiListener listener = new ClientApiListener() {
             @Override
             public void onApiResponse(String id, String json, boolean isOk) {
@@ -428,7 +523,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                         comments.add(comment);
                     }
 
-                    final RVCommentAdapter adapter = new RVCommentAdapter(OrderMoreInfoActivity.this,comments);
+                    final RVCommentAdapter adapter = new RVCommentAdapter(OrderMoreInfoActivity.this, comments);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -443,12 +538,12 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
         };
 
 
-        ClientApi.requestGet(URLS.comment_order+"&service="+service.getId(),listener);
+        ClientApi.requestGet(URLS.comment_order + "&service=" + service.getId(), listener);
 
 
     }
 
-    public void getLikes(){
+    public void getLikes() {
         ClientApiListener listener = new ClientApiListener() {
             @Override
             public void onApiResponse(String id, String json, boolean isOk) {
@@ -459,14 +554,14 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            textLike.setText("Нравится "+likeCount);
+                            textLike.setText("Нравится " + likeCount);
 
                         }
                     });
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject object = jsonArray.getJSONObject(i);
-                        int id_own = E.getAppPreferencesINT(E.APP_PREFERENCES_ID,context);
-                        if (id_own == object.getInt("user_id_owner")){
+                        int id_own = E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context);
+                        if (id_own == object.getInt("user_id_owner")) {
                             isLike = object.getInt("id");
 
                             runOnUiThread(new Runnable() {
@@ -479,7 +574,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
                             });
                             break;
                         }
-                        if (i==jsonArray.length()-1){
+                        if (i == jsonArray.length() - 1) {
                             isLike = 0;
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -498,7 +593,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
             }
         };
 
-        ClientApi.requestGet(URLS.like_order+"&type_id="+service.getId(),listener);
+        ClientApi.requestGet(URLS.like_order + "&type_id=" + service.getId(), listener);
 
     }
 
@@ -577,6 +672,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
         mapView.getOverlays().add(startMarker);
         mapView.invalidate();
     }
+
     private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
         public MyFragmentPagerAdapter(FragmentManager fm) {
@@ -585,7 +681,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return PagerImageFragment.newInstance(position,service.getImages().get(position));
+            return PagerImageFragment.newInstance(position, service.getImages().get(position));
         }
 
         @Override
@@ -598,7 +694,7 @@ public class OrderMoreInfoActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (timer!=null){
+        if (timer != null) {
             timer.cancel();
         }
     }

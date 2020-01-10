@@ -5,17 +5,17 @@ android {
         config {
             keyAlias 'uslugi'
             keyPassword 'lani1909'
-            storeFile file('D:/AndroidProjects/FireBaseDigits/uslugi.jks')
+            storeFile file('C:/Users/lopst/AndroidStudioProjects/uuu')
             storePassword 'lani1909'
         }
     }
-    compileSdkVersion 26
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.ulan.az.usluga"
-        minSdkVersion 15
-        targetSdkVersion 26
-        versionCode 18
-        versionName "1.17"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 26
+        versionName "1.25"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -51,6 +51,7 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'io.michaelrocks:libphonenumber-android:8.8.5'
     implementation 'me.relex:circleindicator:1.2.2'
+    implementation 'com.jsibbold:zoomage:1.2.0'
 
     implementation 'com.github.joielechong:countrycodepicker:2.1.8'
 }

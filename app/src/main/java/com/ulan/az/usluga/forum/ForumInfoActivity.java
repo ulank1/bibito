@@ -161,7 +161,7 @@ public class ForumInfoActivity extends AppCompatActivity {
                             .addFormDataPart("user","/api/v1/users/"+String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID,ForumInfoActivity.this))+"/")
                             .addFormDataPart("comment",editSend.getText().toString()).build();
 
-                    ClientApi.requestPostImage(URLS.comment,req,listener);
+                    ClientApi.requestPostImage(URLS.comment,req,listener,ForumInfoActivity.this);
 
                 }
             }
@@ -263,7 +263,7 @@ public class ForumInfoActivity extends AppCompatActivity {
                             .addFormDataPart("user", "/api/v1/users/" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, ForumInfoActivity.this)) + "/")
                             .addFormDataPart("forum", "/api/v1/forum1/" + String.valueOf(forum.getId()) + "/").build();
 
-                    ClientApi.requestPostImage(URLS.confirmation, req, listener);
+                    ClientApi.requestPostImage(URLS.confirmation, req, listener,ForumInfoActivity.this);
                 }
             });
         }
@@ -325,7 +325,7 @@ public class ForumInfoActivity extends AppCompatActivity {
                     req.addFormDataPart("user_id_owner", E.getAppPreferencesINT(E.APP_PREFERENCES_ID,context)+"");
                     req.addFormDataPart("type_id", forum.getId()+"");
                     RequestBody requestBody = req.build();
-                    ClientApi.requestPostImage(URLS.like_forum_put,requestBody,listener1);
+                    ClientApi.requestPostImage(URLS.like_forum_put,requestBody,listener1,ForumInfoActivity.this);
 
                 }
             }

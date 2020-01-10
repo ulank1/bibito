@@ -1,5 +1,7 @@
 package com.ulan.az.usluga;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -23,8 +25,30 @@ import okhttp3.Response;
 
 public class ClientApi {
 
-    public static void requestPostImage(final String url, RequestBody body, final ClientApiListener clientApiListener) {
 
+    static ProgressDialog progressBar;
+
+
+
+    static void showProgress(Activity activity) {
+        if (progressBar!=null){
+            progressBar.dismiss();
+            progressBar = null;
+        }
+        progressBar =new ProgressDialog(activity);
+        progressBar.show();
+    }
+
+    static void hideProgress() {
+        if (progressBar != null /*&& progressBar!!.isShowing*/) {
+            progressBar.dismiss();
+        }
+        progressBar = null;
+    }
+
+
+    public static void requestPostImage(final String url, RequestBody body, final ClientApiListener clientApiListener, Activity activity) {
+        showProgress(activity);
         OkHttpClient client = new OkHttpClient();
 
 
@@ -41,6 +65,7 @@ public class ClientApi {
             public void onFailure(Call call, IOException e) {
                 //Log.e("Error", e.getMessage());
                 sendFail(url, e.getMessage(), clientApiListener);
+                hideProgress();
             }
 
             @Override
@@ -48,13 +73,44 @@ public class ClientApi {
                 final String json = response.body().string();
                 //Log.e("RESPONSE_Finish", json);
                 sendResponse(url, json, clientApiListener);
-
+                hideProgress();
             }
         });
     }
 
-    public static void requesPutImage(final String url, RequestBody body, final ClientApiListener clientApiListener) {
+    public static void requestPost(final String url, RequestBody body, final ClientApiListener clientApiListener) {
+        OkHttpClient client = new OkHttpClient();
 
+
+        final Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+
+        //Log.e("sssss", "ssss");
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                //Log.e("Error", e.getMessage());
+                sendFail(url, e.getMessage(), clientApiListener);
+                hideProgress();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String json = response.body().string();
+                //Log.e("RESPONSE_Finish", json);
+                sendResponse(url, json, clientApiListener);
+                hideProgress();
+            }
+        });
+    }
+
+    public static void requesPutImage(final String url, RequestBody body, final ClientApiListener clientApiListener,Activity activity) {
+
+        showProgress(activity);
         OkHttpClient client = new OkHttpClient();
 
 
@@ -70,6 +126,7 @@ public class ClientApi {
             @Override
             public void onFailure(Call call, IOException e) {
                 //Log.e("Error", e.getMessage());
+                hideProgress();
                 sendFail(url, e.getMessage(), clientApiListener);
             }
 
@@ -78,7 +135,7 @@ public class ClientApi {
                 final String json = response.body().string();
                 //Log.e("RESPONSE_Finish", json);
                 sendResponse(url, json, clientApiListener);
-
+                hideProgress();
             }
         });
     }

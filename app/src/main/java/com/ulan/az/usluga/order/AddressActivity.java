@@ -59,6 +59,7 @@ public class AddressActivity extends AppCompatActivity implements LocationListen
         mapView.setMultiTouchControls(true);
         mapView.getController().setZoom(15);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.getController().setCenter(new GeoPoint(42.8629, 74.6059));
         mapView.setMapListener(new DelayedMapListener(new MapListener() {
             public boolean onZoom(final ZoomEvent e) {
 
@@ -147,7 +148,17 @@ public class AddressActivity extends AppCompatActivity implements LocationListen
         locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER, 1*1000, 30,
                 this);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            showGPSDisabledAlertToUser();
 
+        }
+    }
+
+    private void showGPSDisabledAlertToUser() {
+
+        Intent callGPSSettingIntent = new Intent(
+                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(callGPSSettingIntent);
     }
 
     public void reverseGeocoding(final double lat, final double lon) {
@@ -160,34 +171,25 @@ public class AddressActivity extends AppCompatActivity implements LocationListen
                 try {
                     if (geocoder.getFromLocation(lat, lon,1).size()>0) {
                         Address adress = geocoder.getFromLocation(lat, lon, 1).get(0);
-                        ////////Log.e("Cityy", adress.toString());
-                        String saddress = adress.toString();
-                        String[] s = saddress.split(",");
-                        for (int i = 0; i < s.length; i++) {
-                            ////////Log.e("City" + i, s[i]);
-                        }
-                        int indexOfDisplayNAme = 20;
-                        String addressFull;
-                        String[] number;
-                        for (int i=15;i<25;i++){
-                            if (s[i].contains("display_name=")){
-                                indexOfDisplayNAme=i;
+                        final String finalAddressFull = adress.getExtras().get("display_name").toString();
+                        String[] s = finalAddressFull.split(",");
+                        final StringBuilder address1 = new StringBuilder();
+
+                        if (adress.getPostalCode()!=null) {
+                            for (String value : s) {
+                                if (!value.contains(adress.getPostalCode())) {
+                                    address1.append(value).append(",");
+                                }
                             }
+                        }else {
+                            address1.append(finalAddressFull).append(",");
                         }
-                        number=s[indexOfDisplayNAme].split("=");
-                        addressFull=number[1];
-                        for (int i=indexOfDisplayNAme+1;i<27;i++){
-                            if (s[i].trim().contains("Бишкек")){
-                                break;
-                            }else addressFull=addressFull+","+s[i];
-                        }
-                        final String finalAddressFull = addressFull;
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 address.setEnabled(true);
                                 progressBar.setVisibility(View.GONE);
-                                address.setText(finalAddressFull);
+                                address.setText(address1.toString().substring(0,address1.length()-1));
                             }
                         });
 

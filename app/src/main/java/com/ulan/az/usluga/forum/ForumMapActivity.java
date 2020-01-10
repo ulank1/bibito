@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.ulan.az.usluga.BuildConfig;
 import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.R;
@@ -29,6 +30,8 @@ import com.ulan.az.usluga.service.ServiceMoreInfoActivity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.config.IConfigurationProvider;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -36,6 +39,8 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.util.ArrayList;
+
+import static org.osmdroid.tileprovider.util.StorageUtils.getStorage;
 
 public class ForumMapActivity extends AppCompatActivity {
     Context context;
@@ -46,6 +51,10 @@ public class ForumMapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_map);
+        IConfigurationProvider provider = Configuration.getInstance();
+        provider.setUserAgentValue(BuildConfig.APPLICATION_ID);
+        provider.setOsmdroidBasePath(getStorage());
+        provider.setOsmdroidTileCache(getStorage());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Услуги");
         context = this;
@@ -55,8 +64,11 @@ public class ForumMapActivity extends AppCompatActivity {
         mapView.setMultiTouchControls(true);
         mapView.getController().setZoom(15);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapView.getController().setCenter(new GeoPoint(42.8629, 74.6059));
-
+        if (Shared.lat_search==0) {
+            mapView.getController().setCenter(new GeoPoint(42.8629, 74.6059));
+        }else {
+            mapView.getController().setCenter(new GeoPoint(Shared.lat_search,Shared.lon_search));
+        }
 
         listener = new ClientApiListener() {
             @Override
@@ -96,8 +108,17 @@ public class ForumMapActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (forum.getGeoPoint()!=null)
-                                    addMarker(forum.getGeoPoint(), finalI);
+                                    if (forum.getGeoPoint()!=null) {
+
+                                        if (Shared.is_search) {
+                                            String s = forum.getDescription().toLowerCase();
+                                            if (s.contains(Shared.search_text.toLowerCase())) {
+                                                addMarker(forum.getGeoPoint(), finalI);
+                                            }
+                                        }else {
+                                            addMarker(forum.getGeoPoint(), finalI);
+                                        }
+                                    }
                                 }
                             });
                         }

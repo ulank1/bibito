@@ -1,8 +1,14 @@
 package com.ulan.az.usluga.order;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
@@ -12,9 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.ulan.az.usluga.BuildConfig;
 import com.ulan.az.usluga.ClientApi;
 import com.ulan.az.usluga.ClientApiListener;
 import com.ulan.az.usluga.R;
@@ -27,6 +35,8 @@ import com.ulan.az.usluga.service.Service;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.config.IConfigurationProvider;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -35,7 +45,9 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.util.ArrayList;
 
-public class OrderMapActivity extends AppCompatActivity {
+import static org.osmdroid.tileprovider.util.StorageUtils.getStorage;
+
+public class OrderMapActivity extends AppCompatActivity implements LocationListener {
     Context context;
     MapView mapView;
     ClientApiListener listener;
@@ -44,6 +56,10 @@ public class OrderMapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_map);
+        IConfigurationProvider provider = Configuration.getInstance();
+        provider.setUserAgentValue(BuildConfig.APPLICATION_ID);
+        provider.setOsmdroidBasePath(getStorage());
+        provider.setOsmdroidTileCache(getStorage());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Задачи");
         context = this;
@@ -53,8 +69,33 @@ public class OrderMapActivity extends AppCompatActivity {
         mapView.setMultiTouchControls(true);
         mapView.getController().setZoom(15);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapView.getController().setCenter(new GeoPoint(42.8629, 74.6059));
+        if (Shared.lat_search==0) {
+            mapView.getController().setCenter(new GeoPoint(42.8629, 74.6059));
+        }else {
+            mapView.getController().setCenter(new GeoPoint(Shared.lat_search,Shared.lon_search));
+        }
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Log.e("Loh", "Loh");
+        } else {
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    10, 0, this);
+            locationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER, 10, 0,
+                    this);
+            Log.e("Loh", "ne_loh");
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+               showGPSDisabledAlertToUser();
+            }
+        }
 
 
         listener = new ClientApiListener() {
@@ -72,7 +113,8 @@ public class OrderMapActivity extends AppCompatActivity {
                             service.setAddress(object.getString("address"));
                             if (!object.isNull("lat"))
                                 service.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
-                            else service.setGeoPoint(new GeoPoint(0,0));                            service.setImage(object.getString("image"));
+                            else service.setGeoPoint(new GeoPoint(0,0));
+                            service.setImage(object.getString("image"));
                             if (object.has("description"))
                                 service.setDescription(object.getString("description"));
                             service.setCategory(object.getJSONObject("sub_category").getString("sub_category"));
@@ -90,7 +132,14 @@ public class OrderMapActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
 
-                                    addMarker(service.getGeoPoint(), finalI);
+                                    if (Shared.is_search) {
+                                        String s = service.getDescription().toLowerCase();
+                                        if (s.contains(Shared.search_text.toLowerCase())) {
+                                            addMarker(service.getGeoPoint(), finalI);
+                                        }
+                                    }else {
+                                        addMarker(service.getGeoPoint(), finalI);
+                                    }
                                 }
                             });
                         }
@@ -100,10 +149,19 @@ public class OrderMapActivity extends AppCompatActivity {
                 }
             }
         };
-        if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED,context))
-            ClientApi.requestGet(URLS.order+"sub_category="+ Shared.category_id,listener);
+
+        Log.e("CATEGORY_ID", String.valueOf(Shared.category_id));
+        if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED_ORDER,context))
+            ClientApi.requestGet(URLS.order+"&sub_category="+ E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_SUBCATEGORY,this),listener);
         else         ClientApi.requestGet(URLS.order,listener);
 
+    }
+
+    private void showGPSDisabledAlertToUser() {
+
+        Intent callGPSSettingIntent = new Intent(
+                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(callGPSSettingIntent);
     }
 
     public void addMarker(GeoPoint geoPoint, int index) {
@@ -117,6 +175,27 @@ public class OrderMapActivity extends AppCompatActivity {
         startMarker.setIcon(getResources().getDrawable(R.drawable.ic_action_location));
         mapView.getOverlays().add(startMarker);
         mapView.invalidate();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Shared.lat_search = location.getLatitude();
+        Shared.lon_search = location.getLongitude();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 
     public class ServiceInfoWindow extends InfoWindow {

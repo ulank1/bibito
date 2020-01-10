@@ -285,7 +285,7 @@ public class AddOrderActivity extends AppCompatActivity {
 
             req = build.build();
 
-            ClientApi.requestPostImage(URLS.order,req,clientApiListener);
+            ClientApi.requestPostImage(URLS.order,req,clientApiListener,this);
         }
 
     }

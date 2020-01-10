@@ -207,7 +207,7 @@ public class RedactorServiceActivity extends AppCompatActivity {
 
             req = build.build();
 
-            ClientApi.requesPutImage(URLS.services_delete + service.getId()+"/",req,clientApiListener);
+            ClientApi.requesPutImage(URLS.services_delete + service.getId()+"/",req,clientApiListener,this);
         }
 
     }

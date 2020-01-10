@@ -51,6 +51,7 @@ import com.ulan.az.usluga.helpers.DataHelper;
 import com.ulan.az.usluga.helpers.E;
 import com.ulan.az.usluga.helpers.Shared;
 import com.ulan.az.usluga.order.AddOrderActivity;
+import com.ulan.az.usluga.tender.TenderOrderActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -281,7 +282,10 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ClientApiListener listener = new ClientApiListener() {
+
+                startActivityForResult(new Intent(ServiceMoreInfoActivity.this,TenderOrderActivity.class).putExtra("service_id",service.getId()),6);
+
+              /*  ClientApiListener listener = new ClientApiListener() {
                     @Override
                     public void onApiResponse(String id, String json, boolean isOk) {
 
@@ -292,7 +296,7 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
                                 JSONArray jsonArray = jsonObject.getJSONArray("objects");
                                 if (jsonArray.length() > 0) {
 
-                                    ClientApiListener listener1 = new ClientApiListener() {
+                                    final ClientApiListener listener1 = new ClientApiListener() {
                                         @Override
                                         public void onApiResponse(String id, String json, boolean isOk) {
                                             Log.e("DDD", json);
@@ -309,11 +313,16 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
                                             }
                                         }
                                     };
-                                    MultipartBody req = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                                    final MultipartBody req = new MultipartBody.Builder().setType(MultipartBody.FORM)
                                             .addFormDataPart("user", "/api/v1/users/" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, ServiceMoreInfoActivity.this)) + "/")
                                             .addFormDataPart("order", "/api/v1/service/" + String.valueOf(service.getId()) + "/").build();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ClientApi.requestPostImage(URLS.confirm_service, req, listener1,ServiceMoreInfoActivity.this);
 
-                                    ClientApi.requestPostImage(URLS.confirm_service, req, listener1);
+                                        }
+                                    });
 
                                 } else {
                                     runOnUiThread(new Runnable() {
@@ -333,7 +342,7 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
                     }
                 };
                 Log.e("DDDDDD", "&sub_category__sub_category=" + service.getCategory().split(" -> ")[1].trim() + "&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, ServiceMoreInfoActivity.this)));
-                ClientApi.requestGet(URLS.order + "&sub_category__sub_category=" + service.getCategory().split(" -> ")[1].trim() + "&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, ServiceMoreInfoActivity.this)), listener);
+                ClientApi.requestGet(URLS.order + "&sub_category__sub_category=" + service.getCategory().split(" -> ")[1].trim() + "&user=" + String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID, ServiceMoreInfoActivity.this)), listener);*/
             }
         });
 
@@ -393,7 +402,53 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
         };
         ClientApi.requestGet(URLS.services + "&user=" + service.getUser().getId(), listener);
 
+    /*    ClientApiListener listener1 = new ClientApiListener() {
+            @Override
+            public void onApiResponse(String id, String json, boolean isOk) {
 
+                if (isOk) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(json);
+                        serviceArrayList = new ArrayList<>();
+                        JSONArray jsonArray = jsonObject.getJSONArray("objects");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            boolean bool = true;
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            Log.e("ID",object.getInt("id")+"");
+                            Service service = new Service();
+                            service.setAddress(object.getString("address"));
+                            if (!object.isNull("experience"))
+                                service.setExperience(object.getDouble("experience"));
+                            if (!object.isNull("lat"))
+                                service.setGeoPoint(new GeoPoint(object.getDouble("lat"), object.getDouble("lng")));
+                            else service.setGeoPoint(new GeoPoint(0, 0));
+                            service.setImage(object.getString("image"));
+                            if (object.has("description"))
+                                service.setDescription(object.getString("description"));
+                            service.setCategory(object.getJSONObject("sub_category").getJSONObject("category").getString("category") + " -> " + object.getJSONObject("sub_category").getString("sub_category"));
+                            service.setId(object.getInt("id"));
+                            User user = new User();
+                            JSONObject jsonUser = object.getJSONObject("user");
+                            user.setAge(jsonUser.getString("age"));
+                            user.setImage(jsonUser.getString("image"));
+                            user.setName(jsonUser.getString("name"));
+                            user.setPhone(jsonUser.getString("phone"));
+                            user.setId(jsonUser.getInt("id"));
+                            service.setUser(user);
+
+                            serviceArrayList.add(service);
+
+                            Log.e("SHODHDJDKJDJDDIJ"," |||| "+user.getName()+" |||| "+service.getCategory());
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        ClientApi.requestGet(URLS.services, listener1);*/
     }
 
 
@@ -414,7 +469,8 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
 
                 String text = "Категория : " + service.getCategory() +
                         "\nTелефон : " + service.getUser().getPhone() +
-                        "\nОписание : " + service.getDescription() + "";
+                        "\nОписание : " + service.getDescription() + ""+
+                        "\nПриложение можно скачать здесь: https://play.google.com/store/apps/details?id=com.ulan.az.usluga";
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -478,7 +534,7 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
                     req.addFormDataPart("user_id_owner", E.getAppPreferencesINT(E.APP_PREFERENCES_ID, context) + "");
                     req.addFormDataPart("type_id", service.getId() + "");
                     RequestBody requestBody = req.build();
-                    ClientApi.requestPostImage(URLS.like_service_put, requestBody, listener1);
+                    ClientApi.requestPostImage(URLS.like_service_put, requestBody, listener1,ServiceMoreInfoActivity.this);
 
                 }
             }
@@ -526,7 +582,7 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
                             .addFormDataPart("author",String.valueOf(E.getAppPreferencesINT(E.APP_PREFERENCES_ID,ServiceMoreInfoActivity.this))+"")
                             .addFormDataPart("comment",editSend.getText().toString()).build();
 
-                    ClientApi.requestPostImage(URLS.comment_service,req,listener);
+                    ClientApi.requestPostImage(URLS.comment_service,req,listener,ServiceMoreInfoActivity.this);
 
                 }
             }
@@ -717,6 +773,17 @@ public class ServiceMoreInfoActivity extends AppCompatActivity {
         }
         startActivity(intent);
 
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==6){
+            Intent intent = getIntent();
+            startActivity(intent);
+            finish();
+        }
     }
 
     public void onClickPhone(View view) {

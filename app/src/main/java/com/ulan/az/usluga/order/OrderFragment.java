@@ -90,6 +90,9 @@ public class OrderFragment extends Fragment implements FilterListener, Searchlis
             public void onApiResponse(String id, String json,boolean isOk) {
                 if (isOk) {
                     try {
+
+                        Log.e("JSON_ORDER",json);
+
                         JSONObject jsonObject = new JSONObject(json);
                         serviceArrayList = new ArrayList<>();
                         JSONArray jsonArray = jsonObject.getJSONArray("objects");
@@ -132,7 +135,6 @@ public class OrderFragment extends Fragment implements FilterListener, Searchlis
                                 images.add(object.getString("image5"));
                             }
 
-                            Log.e("SIAA",images.size()+"");
 
                             service.setImages(images);
                             service.setUser(user);
@@ -157,8 +159,8 @@ public class OrderFragment extends Fragment implements FilterListener, Searchlis
             }
         };
          progressBar.setVisibility(View.VISIBLE);
-         if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED,getContext()))
-        ClientApi.requestGet(URLS.order+"&status=1&sub_category="+ Shared.category_id,listener);
+         if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED_ORDER,getContext()))
+        ClientApi.requestGet(URLS.order+"&status=1&sub_category="+ E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_SUBCATEGORY,getContext()),listener);
             else         ClientApi.requestGet(URLS.order+"&status=1",listener);
 
 
@@ -173,8 +175,8 @@ public class OrderFragment extends Fragment implements FilterListener, Searchlis
     @Override
     public void onFilter(int id) {
         progressBar.setVisibility(View.VISIBLE);
-        if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED,getContext()))
-            ClientApi.requestGet(URLS.order+"&status=1&sub_category="+ Shared.category_id,listener);
+        if (E.getAppPreferencesBoolean(E.APP_PREFERENCES_FILTER_IS_CHECKED_ORDER,getContext()))
+            ClientApi.requestGet(URLS.order+"&status=1&sub_category="+ E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_SUBCATEGORY,getContext()),listener);
         else         ClientApi.requestGet(URLS.order+"&status=1",listener);
 
     }
@@ -192,6 +194,6 @@ public class OrderFragment extends Fragment implements FilterListener, Searchlis
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        ClientApi.requestGet(URLS.order+"&status=1&sub_category="+ Shared.category_id,listener);
+        ClientApi.requestGet(URLS.order+"&status=1&sub_category="+ E.getAppPreferencesINT(E.APP_PREFERENCES_FILTER_SUBCATEGORY,getContext()),listener);
     }
 }

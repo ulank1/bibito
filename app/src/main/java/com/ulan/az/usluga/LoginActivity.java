@@ -139,13 +139,20 @@ public class LoginActivity extends Activity {
             };
             //Log.e("path", path);
             final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/jpg");
-            RequestBody req = new MultipartBody.Builder().setType(MultipartBody.FORM)
+            MultipartBody.Builder req = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("phone", Shared.mobile)
                     .addFormDataPart("name", name.getText().toString())
-                    .addFormDataPart("age", age.getText().toString())
-                    .addFormDataPart("image", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path))).build();
+                    .addFormDataPart("age", age.getText().toString());
 
-            ClientApi.requestPostImage(URLS.users, req, clientApiListener);
+
+
+            RequestBody requestBody;
+            if (!path.isEmpty())
+             req.addFormDataPart("image", path.split("/")[path.split("/").length - 1], RequestBody.create(MEDIA_TYPE_PNG, new File(path)));
+
+
+            requestBody = req.build();
+            ClientApi.requestPostImage(URLS.users, requestBody, clientApiListener,this);
         }
     }
 

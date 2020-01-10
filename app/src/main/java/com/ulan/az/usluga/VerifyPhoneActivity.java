@@ -81,6 +81,8 @@ public class VerifyPhoneActivity extends AppCompatActivity {
     //the country id is concatenated
     //you can take the country id as user input as well
     private void sendVerificationCode(String mobile) {
+        Log.e("SEND","DDD");
+
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 "+" + mobile,
                 60,
@@ -97,16 +99,17 @@ public class VerifyPhoneActivity extends AppCompatActivity {
 
             //Getting the code sent by SMS
             String code = phoneAuthCredential.getSmsCode();
-
+            Log.e("DDFWFSWWFS",phoneAuthCredential.toString());
+            signInWithPhoneAuthCredential(phoneAuthCredential);
             //sometime the code is not detected automatically
             //in this case the code will be null
             //so user has to manually enter the code
-            if (code != null) {
+           /* if (code != null) {
                 editTextCode.setText(code);
                 //verifying the code
                 verifyVerificationCode(code);
-            }
-            //Log.e("onVerificationCompleted", code+"");
+            }*/
+            Log.e("onVerificationCompleted", code+"");
         }
 
         @Override
@@ -118,7 +121,7 @@ public class VerifyPhoneActivity extends AppCompatActivity {
         @Override
         public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
             super.onCodeSent(s, forceResendingToken);
-            //Log.e("onCodeSent", s);
+            Log.e("onCodeSent", s);
             //storing the verification id that is sent to the user
             mVerificationId = s;
         }
@@ -143,7 +146,7 @@ public class VerifyPhoneActivity extends AppCompatActivity {
 //                            Intent intent = new Intent(VerifyPhoneActivity.this, ProfileActivity.class);
 //                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                            startActivity(intent);
-                          //  Toast.makeText(VerifyPhoneActivity.this, "Успешно бутту братишка!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(VerifyPhoneActivity.this, "Вы успешно прошли регистрацию!", Toast.LENGTH_SHORT).show();
 
                             ClientApiListener listener = new ClientApiListener() {
                                 @Override
